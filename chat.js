@@ -66,7 +66,44 @@ ESTILO DENTRO DO ESCOPO
 - Seja claro, direto, útil e entusiasmado, sem inventar fatos.
 - Avise antes de revelar spoilers e, quando possível, confirme se o usuário os aceita.
 - Quando não souber ou não tiver certeza, diga isso claramente.
+
+ESTILO DE COMUNICAÇÃO
+- Responda sempre de forma clara, natural e amigável.
+- Você tem uma identidade inspirada em cultura geek: filmes, séries e jogos.
+- Pode fazer referências leves a filmes, séries, jogos e cultura pop quando
+  combinarem naturalmente com a conversa, sem forçar.
+- Pode usar emojis ocasionalmente para deixar as respostas mais divertidas e
+  expressivas, mas sem exagerar.
+- Não use emojis em todas as mensagens. Normalmente no máximo 1 ou 2, e só
+  quando fizer sentido.
+- Em respostas simples ou puramente informativas, não use emojis.
+- O humor deve ser leve e nunca atrapalhar a compreensão da resposta.
+
+FORMATO DA RESPOSTA
+- Escreva em texto puro, como em uma conversa natural.
+- Não use marcações de Markdown: nada de asteriscos (*) para negrito ou itálico,
+  nada de cerquilha (#) para títulos, nada de blocos de código para destacar texto.
+- Não use travessões (— ou –). Prefira vírgulas, parênteses ou frases separadas.
+- Se precisar listar itens, use frases curtas em linhas separadas, sem símbolos
+  de marcador no início.
 `;
+
+// Mensagens bem-humoradas para falhas de comunicação com a API.
+const MENSAGENS_ERRO_API = [
+    "Erro na API. Ela entrou em outra dimensão. 🌀",
+    "Erro na API. Ela não alcançou 88 mph. ⚡",
+    "Erro na API. Foi para uma galáxia muito, muito distante.",
+    "Erro na API. Os Vingadores já foram chamados. 🦸",
+    "Game Over para a API. Tente novamente. 🎮",
+    "Erro na API. Parece que o feitiço falhou. 🪄",
+    "A API encontrou um chefão inesperado. Tente novamente.",
+    "Erro na API. Perdemos o sinal no multiverso.",
+    "A Força não foi suficiente... a API retornou um erro.",
+    "O DeLorean falhou na viagem e a API não conseguiu voltar. Tente novamente. ⚡"
+];
+
+const mensagemErroAleatoria = () =>
+    MENSAGENS_ERRO_API[Math.floor(Math.random() * MENSAGENS_ERRO_API.length)];
 
 async function main() {
 
@@ -90,13 +127,22 @@ async function main() {
             }
         )
 
-        const response = await openai.responses.create({
-            model: deploymentName,
-            input: historico,
-            instructions: INSTRUCOES_GAMES_FILMES
-        });
+        let respostaChat
 
-        let respostaChat = response.output_text
+        try {
+            const response = await openai.responses.create({
+                model: deploymentName,
+                input: historico,
+                instructions: INSTRUCOES_GAMES_FILMES
+            });
+
+            respostaChat = response.output_text
+        } catch (erro) {
+            console.error("Falha na chamada à API:", erro?.message ?? erro)
+            console.log("\nNeon:", mensagemErroAleatoria());
+            historico.pop()
+            continue;
+        }
 
         historico.push(
             {
