@@ -159,12 +159,15 @@ const CAMPOS_DETALHE = [
   "aggregated_rating_count",
   "rating",
   "rating_count",
-  "category",
-  "status",
+  "hypes",
+  "game_type",
+  "game_status",
   "url"
 ].join(",");
 
-const CATEGORIAS = {
+// A IGDB aposentou os campos `category`/`status`. Agora são `game_type` e
+// `game_status` (mesmos significados, valores numéricos abaixo).
+const TIPOS_JOGO = {
   0: "jogo principal",
   1: "DLC",
   2: "expansão",
@@ -182,14 +185,18 @@ const CATEGORIAS = {
   14: "atualização"
 };
 
-const STATUS = {
+// Tipos que representam um "jogo de verdade" (não bundle/mod/pacote/update).
+const TIPOS_JOGO_REAL = [0, 2, 4, 8, 9, 10, 11];
+
+const STATUS_JOGO = {
   0: "lançado",
-  2: "descontinuado",
+  1: "alpha",
+  2: "beta",
   3: "early access",
   4: "offline",
   5: "cancelado",
   6: "rumor",
-  7: "adiado"
+  7: "removido"
 };
 
 function normalizarResumo(j) {
@@ -197,10 +204,18 @@ function normalizarResumo(j) {
     id: j.id,
     slug: j.slug || null,
     nome: j.name || null,
+    tipoJogo: j.game_type ?? 0,
+    hype: j.hypes || 0,
+    votos: j.rating_count || 0,
     lancamento: formatarData(j.first_release_date),
     plataformas: nomes(j.platforms),
     generos: nomes(j.genres)
   };
+}
+
+// Remove campos internos (só usados para ranquear) antes de mandar ao modelo.
+function limparResumo({ tipoJogo, hype, votos, ...resto }) {
+  return resto;
 }
 
 function empresasPorPapel(lista, papel) {
@@ -213,8 +228,8 @@ function normalizarJogo(j) {
   const lancamentoUnix = j.first_release_date || null;
   return {
     nome: j.name || null,
-    tipo: CATEGORIAS[j.category] || "jogo principal",
-    status: STATUS[j.status] || null,
+    tipo: TIPOS_JOGO[j.game_type] || "jogo principal",
+    status: STATUS_JOGO[j.game_status] || null,
     lancamento: formatarData(lancamentoUnix),
     jaLancou: lancamentoUnix ? lancamentoUnix <= agoraEmSegundos() : null,
     datasPorPlataforma: (j.release_dates || [])
@@ -244,11 +259,13 @@ function normalizarJogo(j) {
 
 // ---------- Funções públicas ----------
 
+const TIPOS_REAL_LISTA = `(${TIPOS_JOGO_REAL.join(",")})`;
+
 export async function buscarJogo(query) {
   const corpo =
     `search "${String(query).replace(/"/g, '\\"')}"; ` +
-    "fields name,slug,first_release_date,platforms.name,genres.name; " +
-    "limit 6;";
+    "fields name,slug,first_release_date,platforms.name,genres.name,game_type,hypes,rating_count; " +
+    "limit 10;";
   const dados = await igdbQuery("games", corpo);
   return (Array.isArray(dados) ? dados : []).map(normalizarResumo);
 }
@@ -260,38 +277,58 @@ export async function detalhesJogo(id) {
 }
 
 // Resolve o jogo mais provável pelo nome e devolve os detalhes completos.
+// A busca da IGDB às vezes coloca bundles, edições "GOTY" ou entradas falsas no
+// topo. Aqui ranqueamos: jogo principal > nome batendo com a busca > mais
+// popular (hype + votos).
 export async function buscarComDetalhes(query) {
   const candidatos = await buscarJogo(query);
   if (!candidatos.length) return null;
-  return detalhesJogo(candidatos[0].id);
+
+  const alvoBusca = String(query).toLowerCase().trim();
+  const pontuar = (c) => {
+    let p = 0;
+    if (c.tipoJogo === 0) p += 1000;
+    else if (TIPOS_JOGO_REAL.includes(c.tipoJogo)) p += 300;
+    const nome = String(c.nome || "").toLowerCase();
+    if (nome === alvoBusca) p += 500;
+    else if (nome.startsWith(alvoBusca)) p += 200;
+    else if (nome.includes(alvoBusca)) p += 80;
+    p += Math.min(c.hype, 200) + Math.min(c.votos, 200);
+    return p;
+  };
+
+  const alvo = [...candidatos].sort((a, b) => pontuar(b) - pontuar(a))[0];
+  return detalhesJogo(alvo.id);
 }
 
 export async function proximosLancamentos() {
   const agora = agoraEmSegundos();
+  // Ordena por "hypes" (quanta gente está acompanhando o lançamento) para trazer
+  // os jogos realmente aguardados, não centenas de indies com data só de ano.
   const corpo =
-    "fields name,slug,first_release_date,platforms.name,genres.name; " +
-    `where first_release_date > ${agora} & category = (0,2,4,8,9); ` +
-    "sort first_release_date asc; limit 12;";
+    "fields name,slug,first_release_date,platforms.name,genres.name,game_type; " +
+    `where first_release_date > ${agora} & game_type = ${TIPOS_REAL_LISTA} & hypes > 3; ` +
+    "sort hypes desc; limit 12;";
   const dados = await igdbQuery("games", corpo);
-  return (Array.isArray(dados) ? dados : []).map(normalizarResumo);
+  return (Array.isArray(dados) ? dados : []).map(normalizarResumo).map(limparResumo);
 }
 
 export async function lancamentosRecentes() {
   const agora = agoraEmSegundos();
   const umAnoAtras = agora - 365 * 24 * 60 * 60;
   const corpo =
-    "fields name,slug,first_release_date,platforms.name,genres.name; " +
-    `where first_release_date > ${umAnoAtras} & first_release_date <= ${agora} & category = (0,2,4,8,9); ` +
+    "fields name,slug,first_release_date,platforms.name,genres.name,game_type; " +
+    `where first_release_date > ${umAnoAtras} & first_release_date <= ${agora} & game_type = ${TIPOS_REAL_LISTA} & rating_count > 5; ` +
     "sort first_release_date desc; limit 12;";
   const dados = await igdbQuery("games", corpo);
-  return (Array.isArray(dados) ? dados : []).map(normalizarResumo);
+  return (Array.isArray(dados) ? dados : []).map(normalizarResumo).map(limparResumo);
 }
 
 export async function jogosPopulares() {
   const corpo =
-    "fields name,slug,first_release_date,platforms.name,genres.name,rating_count; " +
-    "where rating_count > 20 & category = (0,4,8,9); " +
+    "fields name,slug,first_release_date,platforms.name,genres.name,game_type; " +
+    `where rating_count > 20 & game_type = ${TIPOS_REAL_LISTA}; ` +
     "sort rating_count desc; limit 12;";
   const dados = await igdbQuery("games", corpo);
-  return (Array.isArray(dados) ? dados : []).map(normalizarResumo);
+  return (Array.isArray(dados) ? dados : []).map(normalizarResumo).map(limparResumo);
 }
