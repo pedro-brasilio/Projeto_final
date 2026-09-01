@@ -17,262 +17,105 @@
       box-sizing: border-box;
     }
 
+    /* ===================================================== */
+    /* DESIGN TOKENS GLOBAIS                                 */
+    /* ===================================================== */
     :root {
-      /* TEMA DARK CINEMA CYBERPUNK (MODO ESCURO SUPERIOR) */
-      --bg-gradient: radial-gradient(circle at 10% 10%, rgba(168, 85, 247, 0.22), transparent 40%),
-                     radial-gradient(circle at 90% 90%, rgba(6, 182, 212, 0.2), transparent 45%),
-                     radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.1), transparent 50%),
-                     #060812;
-      --app-bg: rgba(13, 18, 30, 0.9);
-      --sidebar-bg: rgba(11, 15, 26, 0.85);
-      --header-bg: rgba(13, 18, 30, 0.6);
-      --border-color: rgba(168, 85, 247, 0.3);
-      --border-glow: rgba(236, 72, 153, 0.6);
-      --card-bg: rgba(22, 32, 54, 0.75);
-      --card-bg-hover: rgba(36, 50, 82, 0.9);
-      
-      --text-main: #ffffff;
+      /* Cor Primária Oficial */
+      --primary: #6050DC;
+      --primary-hover: #7263e6;
+      --primary-active: #5040ca;
+      --primary-soft: rgba(96, 80, 220, 0.12);
+      --primary-soft-hover: rgba(96, 80, 220, 0.20);
+      --primary-border: rgba(96, 80, 220, 0.28);
+      --primary-gradient: linear-gradient(135deg, #6050DC 0%, #7b68ee 50%, #00D9FF 100%);
+
+      /* Identidade da Marca */
+      --brand-neon: #6050DC;
+      --brand-cyan: #00D9FF;
+
+      /* Raios de borda */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 14px;
+      --radius-xl: 18px;
+      --radius-2xl: 20px;
+
+      /* Transições Suaves */
+      --theme-transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* ===================================================== */
+    /* TOKENS DO TEMA ESCURO (DARK MODE)                     */
+    /* ===================================================== */
+    [data-theme="dark"] {
+      --bg-gradient: radial-gradient(circle at 10% 10%, rgba(96, 80, 220, 0.20), transparent 40%),
+                     radial-gradient(circle at 90% 90%, rgba(0, 217, 255, 0.15), transparent 45%),
+                     radial-gradient(circle at 50% 50%, rgba(96, 80, 220, 0.08), transparent 50%),
+                     #080a14;
+      --app-bg: rgba(14, 18, 32, 0.92);
+      --sidebar-bg: rgba(10, 13, 24, 0.90);
+      --header-bg: rgba(14, 18, 32, 0.75);
+      --card-bg: rgba(22, 29, 50, 0.75);
+      --card-bg-hover: rgba(30, 40, 68, 0.90);
+      --input-bg: rgba(18, 24, 42, 0.85);
+
+      --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --text-accent: #f0abfc;
+      --text-accent: #a594fd;
 
-      --primary-accent: #a855f7;
-      --primary-hover: #9333ea;
-      --primary-gradient: linear-gradient(135deg, #a855f7 0%, #d946ef 50%, #06b6d4 100%);
-      --accent-glow: 0 8px 32px rgba(168, 85, 247, 0.45);
+      --border-color: rgba(96, 80, 220, 0.22);
+      --border-glow: rgba(96, 80, 220, 0.55);
 
-      --user-bubble: linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #2563eb 100%);
+      --shadow-color: rgba(0, 0, 0, 0.55);
+      --accent-glow: 0 6px 24px rgba(96, 80, 220, 0.40);
+      --neon-text-glow: 0 0 6px rgba(96, 80, 220, 0.50);
+      --cyan-text-glow: 0 0 6px rgba(0, 217, 255, 0.50);
+      --avatar-glow: 0 4px 18px rgba(96, 80, 220, 0.50), 0 0 16px rgba(0, 217, 255, 0.30);
+
+      --user-bubble: linear-gradient(135deg, #6050DC 0%, #4a3ab8 100%);
       --user-bubble-text: #ffffff;
-      --bot-bubble: rgba(22, 32, 54, 0.95);
+      --bot-bubble: rgba(22, 29, 50, 0.95);
       --bot-bubble-text: #f8fafc;
+    }
 
-      --input-bg: rgba(22, 32, 54, 0.85);
-      --shadow-color: rgba(0, 0, 0, 0.6);
-    }    [data-theme="light"] {
-      /* TEMA LIGHT NEON GLASS (ROXO SUAVIZADO & MODERNO) */
-      --bg-gradient: radial-gradient(circle at 15% 15%, rgba(168, 85, 247, 0.10), transparent 45%),
-                     radial-gradient(circle at 85% 85%, rgba(192, 132, 252, 0.08), transparent 45%),
-                     radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.04), transparent 50%),
-                     #f8fafc;
-      --app-bg: rgba(255, 255, 255, 0.95);
-      --sidebar-bg: rgba(252, 249, 255, 0.94);
-      --header-bg: rgba(255, 255, 255, 0.90);
-      --border-color: rgba(168, 85, 247, 0.18);
-      --border-glow: rgba(192, 132, 252, 0.4);
+    /* ===================================================== */
+    /* TOKENS DO TEMA CLARO (LIGHT MODE)                     */
+    /* ===================================================== */
+    [data-theme="light"] {
+      --bg-gradient: radial-gradient(circle at 10% 10%, rgba(96, 80, 220, 0.08), transparent 45%),
+                     radial-gradient(circle at 90% 90%, rgba(0, 217, 255, 0.06), transparent 45%),
+                     radial-gradient(circle at 50% 50%, rgba(96, 80, 220, 0.03), transparent 50%),
+                     #f4f6fa;
+      --app-bg: rgba(255, 255, 255, 0.96);
+      --sidebar-bg: rgba(248, 249, 253, 0.96);
+      --header-bg: rgba(255, 255, 255, 0.92);
       --card-bg: #ffffff;
-      --card-bg-hover: #f9f5ff;
-
-      --text-main: #7e22ce;
-      --text-muted: #6b7280;
-      --text-accent: #8b5cf6;
-
-      --primary-accent: #8b5cf6;
-      --primary-hover: #7c3aed;
-      --primary-gradient: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%);
-      --accent-glow: 0 6px 20px rgba(139, 92, 246, 0.22);
-
-      --user-bubble: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
-      --user-bubble-text: #ffffff;
-      --bot-bubble: #f5f0ff;
-      --bot-bubble-text: #581c87;
-
+      --card-bg-hover: #f7f6fe;
       --input-bg: #ffffff;
-      --shadow-color: rgba(139, 92, 246, 0.12);
+
+      --text-main: #1e1e2f;
+      --text-muted: #64748b;
+      --text-accent: #6050DC;
+
+      --border-color: rgba(96, 80, 220, 0.16);
+      --border-glow: rgba(96, 80, 220, 0.38);
+
+      --shadow-color: rgba(96, 80, 220, 0.10);
+      --accent-glow: 0 4px 16px rgba(96, 80, 220, 0.22);
+      --neon-text-glow: 0 0 4px rgba(96, 80, 220, 0.25);
+      --cyan-text-glow: 0 0 4px rgba(0, 217, 255, 0.30);
+      --avatar-glow: 0 4px 16px rgba(96, 80, 220, 0.25), 0 0 10px rgba(0, 217, 255, 0.18);
+
+      --user-bubble: linear-gradient(135deg, #6050DC 0%, #7263e6 100%);
+      --user-bubble-text: #ffffff;
+      --bot-bubble: #f8f7ff;
+      --bot-bubble-text: #1e1e2f;
     }
 
-    /* REGRAS DO MODO CLARO (LIGHT MODE) - ESTRUTURA SUAVIZADA */
-
-    /* TEXTOS MAIORES EM ROXO SUAVE */
-    [data-theme="light"] h1,
-    [data-theme="light"] h2,
-    [data-theme="light"] h3,
-    [data-theme="light"] h4,
-    [data-theme="light"] .assistant-text h2,
-    [data-theme="light"] .prompt-card-title,
-    [data-theme="light"] .media-title,
-    [data-theme="light"] .config-group label {
-      color: #7e22ce;
-    }
-
-    [data-theme="light"] .brand-text h1,
-    [data-theme="light"] .hero-welcome h3,
-    [data-theme="light"] .secao-titulo-wrap h2 {
-      background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 50%, #a855f7 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* BOTÕES E BADGES COM ROXO SUAVIZADO E ÍCONES 100% BRANCOS (#ffffff) */
-    [data-theme="light"] .logo,
-    [data-theme="light"] .nova-conversa,
-    [data-theme="light"] .btn-enviar,
-    [data-theme="light"] .btn-recuar-sidebar,
-    [data-theme="light"] .menu-toggle,
-    [data-theme="light"] .theme-toggle-btn.ativo {
-      background: var(--primary-gradient) !important;
-      color: #ffffff !important;
-      border: none !important;
-      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.22) !important;
-    }
-
-    [data-theme="light"] .prompt-card-icon {
-      background: var(--primary-gradient) !important;
-      width: 36px !important;
-      height: 36px !important;
-      border-radius: 10px !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      margin-bottom: 8px !important;
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.20) !important;
-    }
-
-    /* PREENCHIMENTO E CONTORNO BRANCO (#ffffff) NOS BOTÕES ROXOS */
-    [data-theme="light"] .logo svg,
-    [data-theme="light"] .logo svg line,
-    [data-theme="light"] .logo svg rect,
-    [data-theme="light"] .logo svg polygon,
-    [data-theme="light"] .nova-conversa svg,
-    [data-theme="light"] .nova-conversa svg line,
-    [data-theme="light"] .nova-conversa span,
-    [data-theme="light"] .btn-enviar svg,
-    [data-theme="light"] .btn-enviar svg line,
-    [data-theme="light"] .btn-enviar svg polygon,
-    [data-theme="light"] .btn-recuar-sidebar svg,
-    [data-theme="light"] .btn-recuar-sidebar svg line,
-    [data-theme="light"] .btn-recuar-sidebar svg rect,
-    [data-theme="light"] .menu-toggle svg,
-    [data-theme="light"] .menu-toggle svg line,
-    [data-theme="light"] .menu-toggle svg rect,
-    [data-theme="light"] .prompt-card-icon svg,
-    [data-theme="light"] .prompt-card-icon svg line,
-    [data-theme="light"] .prompt-card-icon svg rect,
-    [data-theme="light"] .prompt-card-icon svg path,
-    [data-theme="light"] .prompt-card-icon svg polygon,
-    [data-theme="light"] .theme-toggle-btn.ativo svg,
-    [data-theme="light"] .theme-toggle-btn.ativo svg path,
-    [data-theme="light"] .theme-toggle-btn.ativo svg circle,
-    [data-theme="light"] .theme-toggle-btn.ativo svg line {
-      color: #ffffff !important;
-      stroke: #ffffff !important;
-    }
-
-    [data-theme="light"] .btn-recuar-sidebar svg path,
-    [data-theme="light"] .menu-toggle svg path {
-      fill: #ffffff !important;
-      stroke: none !important;
-      opacity: 0.5 !important;
-    }
-
-    [data-theme="light"] .logo svg polygon {
-      fill: #ffffff !important;
-      stroke: #ffffff !important;
-    }
-
-    /* ITENS DA NAVEGAÇÃO LATERAL */
-    [data-theme="light"] .nav-item {
-      color: #7e22ce;
-    }
-
-    [data-theme="light"] .nav-item svg,
-    [data-theme="light"] .nav-item svg * {
-      color: #8b5cf6 !important;
-      stroke: #8b5cf6 !important;
-    }
-
-    [data-theme="light"] .nav-item:hover {
-      background: rgba(139, 92, 246, 0.08);
-      color: #6d28d9;
-    }
-
-    [data-theme="light"] .nav-item.ativo {
-      background: rgba(139, 92, 246, 0.14);
-      color: #6d28d9;
-    }
-
-    [data-theme="light"] .nav-item.ativo svg,
-    [data-theme="light"] .nav-item.ativo svg * {
-      color: #8b5cf6 !important;
-      stroke: #8b5cf6 !important;
-    }
-
-    /* CARDS DE PROMPT COM BADGES ROXOS E ÍCONES 100% BRANCOS (#ffffff) */
-    [data-theme="light"] .prompt-card-icon {
-      background: var(--primary-gradient) !important;
-      width: 36px !important;
-      height: 36px !important;
-      border-radius: 10px !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      margin-bottom: 8px !important;
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.20) !important;
-      color: #ffffff !important;
-    }
-
-    [data-theme="light"] .prompt-card-icon svg,
-    [data-theme="light"] .prompt-card-icon svg * {
-      color: #ffffff !important;
-      stroke: #ffffff !important;
-    }
-
-    /* CHEVRON & OUTROS ÍCONES DE CATÁLOGO */
-    [data-theme="light"] .chevron,
-    [data-theme="light"] .chevron * {
-      color: #8b5cf6 !important;
-      stroke: #8b5cf6 !important;
-    }
-
-    [data-theme="light"] .btn-card-icon {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      color: #8b5cf6 !important;
-    }
-
-    [data-theme="light"] .btn-card-icon svg,
-    [data-theme="light"] .btn-card-icon svg * {
-      color: #8b5cf6 !important;
-      stroke: #8b5cf6 !important;
-    }
-
-    [data-theme="light"] .theme-toggle-btn:not(.ativo) {
-      color: #7e22ce;
-    }
-
-    [data-theme="light"] .theme-toggle-btn:not(.ativo) svg,
-    [data-theme="light"] .theme-toggle-btn:not(.ativo) svg * {
-      color: #8b5cf6 !important;
-      stroke: #8b5cf6 !important;
-    }
-
-    [data-theme="light"] .prompt-card {
-      background: #ffffff;
-      border-color: rgba(168, 85, 247, 0.25);
-    }
-
-    [data-theme="light"] .prompt-card:hover {
-      background: #f5f3ff;
-      border-color: #7c3aed;
-    }
-
-    [data-theme="light"] .prompt-card-desc {
-      color: #6b7280;
-    }
-
-    [data-theme="light"] .assistant-text p {
-      color: #6b7280;
-    }
-
-    [data-theme="light"] .input-field {
-      color: #4c1d95;
-    }
-
-    [data-theme="light"] .input-field::placeholder {
-      color: #9333ea;
-      opacity: 0.65;
-    }
-
-
+    /* ===================================================== */
+    /* BASE E TRANSIÇÕES SUAVES                              */
+    /* ===================================================== */
     body {
       min-height: 100vh;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -282,18 +125,38 @@
       align-items: center;
       justify-content: center;
       padding: 12px;
-      transition: background 0.3s ease, color 0.3s ease;
+      transition: var(--theme-transition);
     }
 
-    /* GRID DE FUNDO ANIME/CYBER */
+    body,
+    .app,
+    .sidebar,
+    .sidebar-top,
+    .sidebar-footer,
+    .chat-header,
+    .prompt-card,
+    .media-card,
+    .input-wrapper,
+    .theme-toggle-bar,
+    .theme-toggle-btn,
+    .nav-item,
+    .config-box,
+    .config-btn-option,
+    .promo-modal,
+    .mensagem.assistente {
+      transition: var(--theme-transition);
+    }
+
+    /* GRID DE FUNDO */
     body::before {
       content: "";
       position: fixed;
       inset: 0;
       background-image: 
-        linear-gradient(rgba(168, 85, 247, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(168, 85, 247, 0.05) 1px, transparent 1px);
+        linear-gradient(var(--border-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
       background-size: 36px 36px;
+      opacity: 0.35;
       pointer-events: none;
     }
 
@@ -306,7 +169,7 @@
       overflow: hidden;
       background: var(--app-bg);
       border: 1px solid var(--border-color);
-      border-radius: 20px;
+      border-radius: var(--radius-2xl);
       box-shadow: 0 25px 65px var(--shadow-color);
       backdrop-filter: blur(24px);
       position: relative;
@@ -315,7 +178,6 @@
     /* ===================================================== */
     /* SIDEBAR                                               */
     /* ===================================================== */
-
     .sidebar {
       width: 270px;
       flex-shrink: 0;
@@ -323,7 +185,7 @@
       flex-direction: column;
       background: var(--sidebar-bg);
       border-right: 1px solid var(--border-color);
-      transition: all 0.3s ease;
+      transition: width 0.3s ease, var(--theme-transition);
       z-index: 50;
     }
 
@@ -344,15 +206,30 @@
       text-align: center;
     }
 
-    .brand-text h1 {
+    /* IDENTIDADE NEON AI */
+    .brand-logo {
       font-size: 26px;
       font-weight: 850;
-      letter-spacing: -0.6px;
-      background: var(--primary-gradient);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       line-height: 1.1;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    .brand-neon {
+      color: var(--brand-neon);
+      text-shadow: var(--neon-text-glow);
+      transition: text-shadow 0.2s ease, color 0.2s ease;
+    }
+
+    .brand-ai {
+      color: var(--brand-cyan);
+      text-shadow: var(--cyan-text-glow);
+      transition: text-shadow 0.2s ease, color 0.2s ease;
     }
 
     .btn-recuar-sidebar {
@@ -457,9 +334,10 @@
     }
 
     .theme-toggle-btn svg {
-      width: 19px;
-      height: 19px;
+      width: 18px;
+      height: 18px;
       flex-shrink: 0;
+      color: currentColor;
     }
 
     .sidebar.recolhida .status {
@@ -476,34 +354,39 @@
       gap: 9px;
       padding: 12px;
       border: none;
-      border-radius: 14px;
-      background: var(--primary-gradient);
+      border-radius: var(--radius-lg);
+      background: var(--primary);
       color: #ffffff;
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       box-shadow: var(--accent-glow);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .nova-conversa svg {
-      width: 21px;
-      height: 21px;
+      width: 20px;
+      height: 20px;
       flex-shrink: 0;
+      color: #ffffff;
+      stroke: #ffffff;
     }
 
     .nova-conversa:hover {
+      background: var(--primary-hover);
       transform: translateY(-2px);
-      filter: brightness(1.1);
+      box-shadow: 0 6px 22px rgba(96, 80, 220, 0.45);
     }
 
     .nova-conversa:active {
       transform: scale(0.98);
+      background: var(--primary-active);
     }
 
-    .nova-conversa svg {
-      width: 18px;
-      height: 18px;
+    .nova-conversa:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
     }
 
     /* MENU DE NAVEGAÇÃO */
@@ -532,7 +415,7 @@
       gap: 12px;
       padding: 11px 14px;
       border: none;
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       background: transparent;
       color: var(--text-muted);
       font-size: 14px;
@@ -540,17 +423,17 @@
       text-align: left;
       cursor: pointer;
       position: relative;
-      transition: all 0.2s ease;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     .nav-item:hover {
-      background: var(--card-bg-hover);
+      background: var(--primary-soft);
       color: var(--text-main);
     }
 
     .nav-item.ativo {
-      background: rgba(139, 92, 246, 0.15);
-      color: var(--text-main);
+      background: var(--primary-soft);
+      color: var(--primary);
       font-weight: 700;
     }
 
@@ -563,18 +446,19 @@
       width: 4px;
       height: 22px;
       border-radius: 0 4px 4px 0;
-      background: var(--primary-accent);
-      box-shadow: 0 0 10px var(--primary-accent);
+      background: var(--primary);
+      box-shadow: 0 0 10px var(--primary);
     }
 
     .nav-item svg {
-      width: 23px;
-      height: 23px;
+      width: 22px;
+      height: 22px;
       flex-shrink: 0;
+      color: currentColor;
     }
 
     .nav-item.ativo svg {
-      color: var(--primary-accent);
+      color: var(--primary);
     }
 
     .nav-item span {
@@ -622,17 +506,17 @@
       font-weight: 500;
       text-align: left;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: background-color 0.15s ease, color 0.15s ease;
     }
 
     .hist-item:hover {
-      background: var(--card-bg-hover);
+      background: var(--primary-soft);
       color: var(--text-main);
     }
 
     .hist-item.ativo {
-      background: rgba(139, 92, 246, 0.2);
-      color: var(--text-main);
+      background: var(--primary-soft);
+      color: var(--primary);
       font-weight: 600;
     }
 
@@ -654,7 +538,7 @@
       font-size: 11px;
       font-weight: 500;
       color: var(--text-muted);
-      opacity: 0.7;
+      opacity: 0.75;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -702,10 +586,10 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      padding: 6px 8px;
+      gap: 8px;
+      padding: 5px;
       background: var(--card-bg);
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       border: 1px solid var(--border-color);
     }
 
@@ -715,9 +599,9 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      padding: 6px;
+      padding: 7px 10px;
       border: none;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       background: transparent;
       color: var(--text-muted);
       font-size: 12px;
@@ -726,10 +610,20 @@
       transition: all 0.2s ease;
     }
 
+    .theme-toggle-btn:hover:not(.ativo) {
+      color: var(--text-main);
+      background: var(--primary-soft);
+    }
+
     .theme-toggle-btn.ativo {
-      background: var(--primary-gradient);
+      background: var(--primary);
       color: #ffffff;
-      box-shadow: 0 2px 10px rgba(139, 92, 246, 0.3);
+      box-shadow: 0 2px 10px rgba(96, 80, 220, 0.35);
+    }
+
+    .theme-toggle-btn.ativo svg {
+      color: #ffffff;
+      stroke: #ffffff;
     }
 
     .status {
@@ -751,7 +645,6 @@
     /* ===================================================== */
     /* ÁREA PRINCIPAL                                        */
     /* ===================================================== */
-
     .chat-container {
       flex: 1;
       min-width: 0;
@@ -788,7 +681,7 @@
       align-items: center;
       justify-content: center;
       border: 1px solid var(--border-color);
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       background: var(--card-bg);
       color: var(--text-main);
       cursor: pointer;
@@ -808,10 +701,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 50%, #4facfe 100%);
+      background: linear-gradient(135deg, var(--brand-neon) 0%, var(--brand-cyan) 100%);
       padding: 2.5px;
-      box-shadow: 0 4px 18px rgba(168, 85, 247, 0.45);
+      box-shadow: var(--avatar-glow);
       position: relative;
+      transition: box-shadow 0.2s ease;
     }
 
     .pixel-avatar-img {
@@ -828,6 +722,7 @@
       font-size: 16px;
       font-weight: 700;
       letter-spacing: -0.2px;
+      color: var(--text-main);
     }
 
     .assistant-text p {
@@ -836,16 +731,6 @@
       color: var(--text-muted);
     }
 
-    .header-tag {
-      padding: 6px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--border-color);
-      background: rgba(139, 92, 246, 0.15);
-      color: var(--text-accent);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
 
     /* VIEW DO CHAT */
     #viewChat {
@@ -887,18 +772,38 @@
       animation: fadeIn 0.5s ease;
     }
 
-    .hero-badge {
-      display: inline-flex;
+    .hero-mascot-wrap {
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: 30px;
-      background: rgba(139, 92, 246, 0.15);
-      border: 1px solid var(--border-color);
-      color: var(--text-accent);
-      font-size: 12px;
-      font-weight: 700;
       margin-bottom: 10px;
+    }
+
+    .pixel-speech-bubble-hero {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand-neon) 0%, var(--brand-cyan) 100%);
+      padding: 3px;
+      box-shadow: var(--avatar-glow);
+      animation: floatMascot 3.5s ease-in-out infinite;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .pixel-hero-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      image-rendering: pixelated;
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      background: #1e1b4b;
+    }
+
+    @keyframes floatMascot {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
     }
 
     .hero-welcome h3 {
@@ -906,18 +811,15 @@
       font-weight: 800;
       letter-spacing: -0.5px;
       margin-bottom: 14px;
-      background: var(--primary-gradient);
+      color: var(--text-main);
+    }
+
+    .hero-highlight {
+      color: var(--primary);
+      background: linear-gradient(135deg, var(--brand-neon) 0%, var(--brand-cyan) 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-    }
-
-    .hero-welcome p {
-      max-width: 540px;
-      color: var(--text-muted);
-      font-size: 13px;
-      line-height: 1.5;
-      margin-bottom: 18px;
     }
 
     .cards-grid {
@@ -933,12 +835,13 @@
       flex-direction: column;
       align-items: flex-start;
       text-align: left;
-      padding: 10px 12px;
-      border-radius: 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius-lg);
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 14px var(--shadow-color);
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     .prompt-card:hover {
@@ -955,17 +858,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--primary-gradient);
-      color: #ffffff;
-      margin-bottom: 6px;
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+      background: var(--primary-soft);
+      color: var(--primary);
+      margin-bottom: 8px;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     .prompt-card-icon svg {
       width: 18px;
       height: 18px;
-      color: #ffffff;
-      stroke: #ffffff;
+      color: var(--primary);
+      stroke: var(--primary);
     }
 
     .prompt-card-title {
@@ -1009,12 +912,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--primary-gradient);
+      background: linear-gradient(135deg, var(--brand-neon) 0%, var(--brand-cyan) 100%);
       padding: 2px;
-      box-shadow: 0 4px 14px rgba(168, 85, 247, 0.45);
+      box-shadow: var(--avatar-glow);
       position: relative;
       align-self: flex-start;
       margin-top: 2px;
+      transition: box-shadow 0.2s ease;
     }
 
     .mensagem {
@@ -1024,7 +928,7 @@
       line-height: 1.5;
       word-break: break-word;
       max-width: 85%;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 15px var(--shadow-color);
       white-space: pre-wrap;
     }
 
@@ -1040,11 +944,11 @@
       color: var(--bot-bubble-text);
       border-top-left-radius: 4px;
       border: 1px solid var(--border-color);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12), 0 0 12px rgba(168, 85, 247, 0.15);
+      box-shadow: 0 4px 20px var(--shadow-color), 0 0 12px rgba(96, 80, 220, 0.12);
       position: relative;
     }
 
-    /* TRIÂNGULO/RABICÓ DO BALÃO DE MENSAGEM APONTANDO PARA O AVATAR */
+    /* TRIÂNGULO DO BALÃO DE MENSAGEM */
     .mensagem.assistente::before {
       content: "";
       position: absolute;
@@ -1060,40 +964,6 @@
       z-index: 2;
     }
 
-    /* MASCOTE HERO EM BALÃO ARRODONDADO SEM PONTA */
-    .hero-mascot-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .pixel-speech-bubble-hero {
-      position: relative;
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      background: var(--primary-gradient);
-      padding: 3px;
-      box-shadow: 0 8px 25px rgba(168, 85, 247, 0.45), 0 0 20px rgba(6, 182, 212, 0.3);
-      animation: floatMascot 3.5s ease-in-out infinite;
-    }
-
-    .pixel-hero-img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-      image-rendering: pixelated;
-      border: 2px solid rgba(255, 255, 255, 0.9);
-      background: #1e1b4b;
-    }
-
-    @keyframes floatMascot {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
     /* DIGITANDO ANIMATION */
     .digitando {
       display: flex;
@@ -1106,7 +976,7 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: var(--primary-accent);
+      background: var(--primary);
       animation: pulso 1.2s infinite ease-in-out;
     }
 
@@ -1150,16 +1020,16 @@
       align-items: center;
       background: var(--input-bg);
       border: 1px solid var(--border-color);
-      border-radius: 18px;
+      border-radius: var(--radius-xl);
       padding: 4px 6px 4px 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 24px var(--shadow-color);
       backdrop-filter: blur(16px);
-      transition: all 0.25s ease;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     }
 
     .input-wrapper:focus-within {
-      border-color: var(--primary-accent);
-      box-shadow: 0 0 20px rgba(139, 92, 246, 0.35);
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(96, 80, 220, 0.35);
     }
 
     .input-field {
@@ -1175,26 +1045,37 @@
 
     .input-field::placeholder {
       color: var(--text-muted);
+      opacity: 0.8;
     }
 
     .btn-enviar {
       width: 44px;
       height: 44px;
-      border-radius: 14px;
+      border-radius: var(--radius-lg);
       border: none;
-      background: var(--primary-gradient);
+      background: var(--primary);
       color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       box-shadow: var(--accent-glow);
-      transition: all 0.2s ease;
+      transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .btn-enviar:hover {
+      background: var(--primary-hover);
       transform: scale(1.05);
-      filter: brightness(1.1);
+      box-shadow: 0 4px 18px rgba(96, 80, 220, 0.45);
+    }
+
+    .btn-enviar:active {
+      background: var(--primary-active);
+    }
+
+    .btn-enviar:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
     }
 
     .btn-enviar:disabled {
@@ -1206,6 +1087,8 @@
     .btn-enviar svg {
       width: 20px;
       height: 20px;
+      color: #ffffff;
+      stroke: #ffffff;
     }
 
     .disclaimer {
@@ -1217,7 +1100,6 @@
     /* ===================================================== */
     /* VIEWS GENÉRICAS (JOGOS, FILMES, WATCHLIST, CONFIGS)   */
     /* ===================================================== */
-
     .view-secao {
       flex: 1;
       overflow-y: auto;
@@ -1239,10 +1121,7 @@
     .secao-titulo-wrap h2 {
       font-size: 22px;
       font-weight: 800;
-      background: var(--primary-gradient);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--text-main);
     }
 
     .secao-titulo-wrap p {
@@ -1261,11 +1140,12 @@
     .media-card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 18px;
+      border-radius: var(--radius-xl);
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 16px var(--shadow-color);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
       position: relative;
     }
 
@@ -1341,9 +1221,9 @@
       flex: 1;
       padding: 9px;
       border-radius: 10px;
-      border: 1px solid var(--border-color);
-      background: rgba(139, 92, 246, 0.1);
-      color: var(--text-accent);
+      border: 1px solid var(--primary-border);
+      background: var(--primary-soft);
+      color: var(--primary);
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
@@ -1355,8 +1235,9 @@
     }
 
     .btn-card-action:hover {
-      background: var(--primary-accent);
+      background: var(--primary);
       color: #ffffff;
+      border-color: var(--primary);
     }
 
     .btn-card-icon {
@@ -1383,12 +1264,13 @@
     .config-box {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 18px;
+      border-radius: var(--radius-xl);
       padding: 24px;
       max-width: 650px;
       display: flex;
       flex-direction: column;
       gap: 20px;
+      box-shadow: 0 4px 16px var(--shadow-color);
     }
 
     .config-group {
@@ -1411,7 +1293,7 @@
 
     .config-btn-option {
       padding: 14px;
-      border-radius: 14px;
+      border-radius: var(--radius-lg);
       border: 1px solid var(--border-color);
       background: transparent;
       color: var(--text-muted);
@@ -1420,23 +1302,33 @@
       cursor: pointer;
       text-align: center;
       transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
 
     .config-btn-option:hover {
       border-color: var(--border-glow);
       color: var(--text-main);
+      background: var(--primary-soft);
     }
 
     .config-btn-option.ativo {
-      background: var(--primary-gradient);
+      background: var(--primary);
       color: #ffffff;
       border-color: transparent;
       box-shadow: var(--accent-glow);
     }
 
+    .config-btn-option.ativo svg {
+      color: #ffffff;
+      stroke: #ffffff;
+    }
+
     .danger-btn {
       padding: 12px 20px;
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       border: 1px solid rgba(239, 68, 68, 0.3);
       background: rgba(239, 68, 68, 0.15);
       color: #ef4444;
@@ -1464,7 +1356,7 @@
 
     .overlay.ativo { display: block; }
 
-    /* ===== PROMOÇÕES DE JOGOS (dados via backend /api/deals — CheapShark) ===== */
+    /* ===== PROMOÇÕES DE JOGOS ===== */
     .promo-toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -1483,7 +1375,7 @@
       transition: border-color 0.2s ease;
     }
     .promo-toolbar input:focus,
-    .promo-toolbar select:focus { border-color: var(--border-glow); }
+    .promo-toolbar select:focus { border-color: var(--primary); }
     .promo-toolbar input#promoBusca { flex: 1; min-width: 180px; }
 
     .deal-prices {
@@ -1508,18 +1400,19 @@
       left: 12px;
       padding: 4px 9px;
       border-radius: 20px;
-      background: var(--primary-gradient);
+      background: var(--primary);
       color: #fff;
       font-size: 12px;
       font-weight: 800;
       letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     }
     .deal-store {
       display: inline-flex;
       align-items: center;
       gap: 5px;
       font-weight: 700;
-      color: var(--text-accent);
+      color: var(--primary);
     }
     .deal-store img { width: 16px; height: 16px; border-radius: 4px; object-fit: contain; }
     a.btn-card-action { text-decoration: none; }
@@ -1540,12 +1433,13 @@
     .promo-modal {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 18px;
+      border-radius: var(--radius-xl);
       width: 100%;
       max-width: 460px;
       max-height: 80vh;
       overflow-y: auto;
       padding: 22px;
+      box-shadow: 0 20px 50px var(--shadow-color);
     }
     .promo-modal h3 {
       font-size: 17px;
@@ -1572,7 +1466,7 @@
     .promo-store-row a {
       font-size: 12px;
       font-weight: 700;
-      color: var(--text-accent);
+      color: var(--primary);
       text-decoration: none;
       white-space: nowrap;
     }
@@ -1587,6 +1481,11 @@
       font-weight: 700;
       font-size: 13px;
       cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .promo-modal-close:hover {
+      background: var(--primary-soft);
+      color: var(--text-main);
     }
     .promo-loadmore {
       grid-column: 1 / -1;
@@ -1597,12 +1496,17 @@
     .promo-loadmore button {
       padding: 10px 22px;
       border-radius: 12px;
-      border: 1px solid var(--border-color);
-      background: rgba(139, 92, 246, 0.1);
-      color: var(--text-accent);
+      border: 1px solid var(--primary-border);
+      background: var(--primary-soft);
+      color: var(--primary);
       font-weight: 700;
       font-size: 13px;
       cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .promo-loadmore button:hover {
+      background: var(--primary);
+      color: #ffffff;
     }
     .promo-loadmore button:disabled { opacity: 0.5; cursor: default; }
 
@@ -1635,7 +1539,7 @@
       <div class="sidebar-top">
         <div class="brand">
           <div class="brand-text">
-            <h1>Neon AI</h1>
+            <h1 class="brand-logo"><span class="brand-neon">Neon</span> <span class="brand-ai">AI</span></h1>
           </div>
           <button class="btn-recuar-sidebar" id="btnRecuarSidebar" title="Recuar / Expandir Sidebar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="19" height="19">
@@ -1765,8 +1669,6 @@
             <p id="headerDesc">Sua especialista em cultura pop</p>
           </div>
         </div>
-
-        <span class="header-tag" id="headerTag">GAMES & CINEMA</span>
       </header>
 
       <!-- VIEW 1: CHAT -->
@@ -1781,7 +1683,7 @@
             </div>
 
 
-            <h3>O que vamos explorar hoje?</h3>
+            <h3>O que vamos explorar <span class="hero-highlight">hoje?</span></h3>
 
             <div class="cards-grid">
               <div class="prompt-card" data-prompt="Me indique 3 filmes incríveis de suspense ou ficção científica para assistir hoje à noite com notas altas.">
@@ -1933,10 +1835,10 @@
             <label>Tema da Interface</label>
             <div class="config-options">
               <button class="config-btn-option ativo" id="cfgDark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-right: 6px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Dark Cinema
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-right: 6px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Modo Escuro
               </button>
               <button class="config-btn-option" id="cfgLight">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-right: 6px;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Light Ice
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-right: 6px;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Modo Claro
               </button>
             </div>
           </div>
@@ -2096,7 +1998,6 @@
     const headerIcone = document.getElementById("headerIcone");
     const headerTitulo = document.getElementById("headerTitulo");
     const headerDesc = document.getElementById("headerDesc");
-    const headerTag = document.getElementById("headerTag");
     
     const mensagens = document.getElementById("mensagens");
     const heroWelcome = document.getElementById("heroWelcome");
@@ -2164,7 +2065,6 @@
       headerIcone.innerHTML = meta.icone;
       headerTitulo.textContent = meta.titulo;
       headerDesc.textContent = meta.desc;
-      if (headerTag) headerTag.textContent = meta.tag;
 
       viewChat.style.display = id === "assistente" ? "flex" : "none";
       viewJogos.style.display = id === "jogos" ? "flex" : "none";
