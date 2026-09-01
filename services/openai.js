@@ -61,12 +61,14 @@ const FORMATO_CLASSIFICACAO = `
 Responda APENAS com um objeto JSON válido, sem texto antes ou depois, no formato:
 {
   "precisaDadosAtuais": boolean,   // true só quando a resposta depende de algo que muda com o tempo
-  "fonte": "omdb" | "igdb" | null, // omdb = filmes/séries, igdb = jogos
+  "fonte": "omdb" | "igdb" | "promocoes" | null, // omdb = filmes/séries, igdb = jogos, promocoes = preços/ofertas de jogos de PC
   "tipo": "filme" | "serie" | "jogo" | null,
   "consulta": string,              // nome da obra/jogo já resolvido pelo contexto ("" se não houver)
   "ano": string,                   // ano da obra quando o contexto deixar claro ("" se não houver)
   "temporada": number | null,      // número da temporada quando a pergunta for sobre uma temporada específica
-  "modo": "detalhes" | "lancamentos_futuros" | "em_cartaz_agora" | "series_no_ar" | "populares" | "generico"
+  "loja": string,                  // só para "promocoes": loja citada ("Steam","GOG","Epic","Humble","Fanatical",...) ou ""
+  "limite": number | null,         // só para "promocoes": quantidade pedida ("top 2" -> 2, "as 3 melhores" -> 3), senão null
+  "modo": "detalhes" | "lancamentos_futuros" | "em_cartaz_agora" | "series_no_ar" | "populares" | "promocoes" | "generico"
 }
 
 Regras:
@@ -81,13 +83,22 @@ Regras:
   "o segundo", "o próximo", "e o jogo?", "e a continuação?". Preencha "consulta"
   com o nome real e completo da obra.
 - Se pelo contexto for um jogo, fonte = "igdb". Se for filme ou série, fonte = "omdb".
+- fonte = "promocoes" (e precisaDadosAtuais = true) quando a pergunta for sobre
+  PREÇO, PROMOÇÃO, DESCONTO, OFERTA, "está barato?", "quanto custa agora?",
+  "vale a pena comprar agora?", "onde comprar mais barato?", "tá em promoção?",
+  ou comparar o preço de um jogo de PC entre lojas.
+  * Se for o preço/oferta de UM jogo específico: modo = "detalhes" e "consulta" = nome do jogo.
+  * Se for uma lista ("as melhores promoções", "promoções da Steam essa semana",
+    "top 5 ofertas"): modo = "promocoes", "consulta" = "".
+  * "loja": preencha se o usuário citar a loja; senão "".
+  * "limite": preencha com o número pedido; senão null.
 - "modo": use "detalhes" quando a pergunta for sobre uma obra específica (com
   "consulta" preenchida). Use um modo de lista quando NÃO houver obra específica:
   "em_cartaz_agora" (filmes em cartaz), "lancamentos_futuros" (próximas estreias
   de filmes ou jogos), "series_no_ar" (séries em exibição agora), "populares"
-  (filmes, séries ou jogos populares do momento).
+  (filmes, séries ou jogos populares do momento), "promocoes" (lista de ofertas).
 - Se precisaDadosAtuais = false, use fonte = null, consulta = "", ano = "",
-  temporada = null, modo = "generico".
+  temporada = null, loja = "", limite = null, modo = "generico".
 `;
 
 /**
@@ -107,6 +118,8 @@ export async function classificarIntencao({ historico, mensagem }) {
     consulta: "",
     ano: "",
     temporada: null,
+    loja: "",
+    limite: null,
     modo: "generico"
   };
 
@@ -137,20 +150,24 @@ export async function classificarIntencao({ historico, mensagem }) {
     if (!json) return neutro;
 
     const temporada = Number(json.temporada);
+    const limite = Number(json.limite);
 
     return {
       precisaDadosAtuais: Boolean(json.precisaDadosAtuais),
-      fonte: json.fonte === "omdb" || json.fonte === "igdb" ? json.fonte : null,
+      fonte: ["omdb", "igdb", "promocoes"].includes(json.fonte) ? json.fonte : null,
       tipo: ["filme", "serie", "jogo"].includes(json.tipo) ? json.tipo : null,
       consulta: typeof json.consulta === "string" ? json.consulta.trim() : "",
       ano: typeof json.ano === "string" ? json.ano.trim() : "",
       temporada: Number.isFinite(temporada) && temporada > 0 ? temporada : null,
+      loja: typeof json.loja === "string" ? json.loja.trim() : "",
+      limite: Number.isFinite(limite) && limite > 0 ? Math.min(Math.floor(limite), 20) : null,
       modo: [
         "detalhes",
         "lancamentos_futuros",
         "em_cartaz_agora",
         "series_no_ar",
         "populares",
+        "promocoes",
         "generico"
       ].includes(json.modo)
         ? json.modo

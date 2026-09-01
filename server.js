@@ -24,6 +24,7 @@ import { gerarResposta } from "./services/openai.js";
 import * as tmdb from "./services/tmdb.js";
 import * as igdb from "./services/igdb.js";
 import { mensagemErroAleatoria, registrarErroInterno } from "./chat/errors.js";
+import dealsRoutes from "./routes/deals.routes.js";
 
 dotenv.config();
 
@@ -69,6 +70,11 @@ function getUserId(req) {
 app.get("/", (req, res) => {
   res.send("BEM VINDO AO SERVIDOR NEON AI");
 });
+
+// Integração de promoções de jogos (CheapShark hoje; preparada para outras
+// fontes no futuro). Módulo isolado: rotas, controllers, provider e cache
+// próprios em routes/, controllers/, providers/ e utils/. Ver routes/deals.routes.js.
+app.use("/api", dealsRoutes);
 
 app.post("/chat", async (req, res) => {
   const entrada = validarEntrada(req.body);

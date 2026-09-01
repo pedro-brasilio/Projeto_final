@@ -14,6 +14,7 @@ import { classificarIntencao } from "../services/openai.js";
 import * as omdb from "../services/omdb.js";
 import * as tmdb from "../services/tmdb.js";
 import * as igdb from "../services/igdb.js";
+import * as promocoes from "../providers/cheapShark.provider.js";
 import { registrarErroInterno } from "./errors.js";
 
 // Serializa objetos de dados de forma legível para o modelo.
@@ -88,6 +89,77 @@ async function coletarIgdb({ modo, consulta }) {
   }
 }
 
+// Promoções e preços de jogos de PC (provider CheapShark, preços já em BRL).
+// Dois casos: preço/ofertas de UM jogo (modo "detalhes" + consulta) ou uma
+// LISTA de promoções (modo "promocoes"), opcionalmente filtrada por loja.
+async function coletarPromocoes({ modo, consulta, loja, limite }) {
+  const n = Math.min(Math.max(limite || 5, 1), 15);
+
+  // 1. Preço/ofertas de um jogo específico -> comparação entre lojas.
+  if (consulta) {
+    const { items: achados } = await promocoes.searchGames({ query: consulta, limit: 5 });
+    if (!achados.length) {
+      return bloco(`Não encontrei "${consulta}" na base de promoções de jogos de PC.`, {});
+    }
+    const alvo = achados[0];
+    const { item } = await promocoes.getGameDeals({ gameId: alvo.gameId });
+    if (!item || !item.deals.length) {
+      return bloco(`Sem ofertas ativas para "${alvo.title}" agora.`, { jogo: alvo.title });
+    }
+    return bloco(`Ofertas atuais de "${item.title}" (preços em reais, BRL):`, {
+      jogo: item.title,
+      menorPrecoHistoricoBRL: item.cheapestPriceEver ? item.cheapestPriceEver.price : null,
+      ofertas: item.deals.map((d) => ({
+        loja: d.store?.name || null,
+        precoNormal: d.pricing.normal,
+        precoPromocional: d.pricing.sale,
+        desconto: `${d.pricing.discountPercent}%`
+      }))
+    });
+  }
+
+  // 2. Lista de promoções. Se a loja foi citada, filtra por ela.
+  let storeId;
+  let nomeLoja = "";
+  if (loja) {
+    try {
+      const { items: lojas } = await promocoes.getStores({ onlyActive: true });
+      const achou = lojas.find(
+        (l) => l.name && l.name.toLowerCase().includes(loja.toLowerCase())
+      );
+      if (achou) {
+        storeId = achou.id;
+        nomeLoja = achou.name;
+      }
+    } catch {
+      /* sem lista de lojas: cai para o top geral */
+    }
+  }
+
+  const { items } = storeId
+    ? await promocoes.getDeals({ limit: n, storeId, sort: "dealRating", onSale: true })
+    : await promocoes.getTopDeals({ limit: n });
+
+  if (!items.length) return null;
+
+  const titulo = nomeLoja
+    ? `${n} melhores promoções de jogos na ${nomeLoja} agora (preços em BRL):`
+    : `${n} melhores promoções de jogos de PC agora (preços em BRL):`;
+
+  return bloco(
+    titulo,
+    items.map((d) => ({
+      jogo: d.title,
+      loja: d.store?.name || null,
+      de: d.pricing.normal,
+      por: d.pricing.sale,
+      desconto: `${d.pricing.discountPercent}%`,
+      notaSteam: d.ratings?.steam ?? null,
+      metacritic: d.ratings?.metacritic ?? null
+    }))
+  );
+}
+
 export async function rotearMensagem({ historico, mensagem }) {
   const resultado = { dadosExternos: null, fonteUsada: null, houveFalhaFonte: false };
 
@@ -107,6 +179,10 @@ export async function rotearMensagem({ historico, mensagem }) {
       if (!igdb.igdbConfigurado()) return resultado;
       resultado.dadosExternos = await coletarIgdb(intencao);
       resultado.fonteUsada = resultado.dadosExternos ? "igdb" : null;
+    } else if (intencao.fonte === "promocoes") {
+      if (!promocoes.isConfigured()) return resultado;
+      resultado.dadosExternos = await coletarPromocoes(intencao);
+      resultado.fonteUsada = resultado.dadosExternos ? "promocoes" : null;
     }
   } catch (erro) {
     // Falha ao consultar a fonte externa: não quebramos a conversa.

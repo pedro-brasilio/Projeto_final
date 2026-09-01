@@ -1464,6 +1464,148 @@
 
     .overlay.ativo { display: block; }
 
+    /* ===== PROMOÇÕES DE JOGOS (dados via backend /api/deals — CheapShark) ===== */
+    .promo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .promo-toolbar input,
+    .promo-toolbar select {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-main);
+      font-size: 13px;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+    .promo-toolbar input:focus,
+    .promo-toolbar select:focus { border-color: var(--border-glow); }
+    .promo-toolbar input#promoBusca { flex: 1; min-width: 180px; }
+
+    .deal-prices {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .deal-old {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+    .deal-new {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .deal-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 4px 9px;
+      border-radius: 20px;
+      background: var(--primary-gradient);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .deal-store {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 700;
+      color: var(--text-accent);
+    }
+    .deal-store img { width: 16px; height: 16px; border-radius: 4px; object-fit: contain; }
+    a.btn-card-action { text-decoration: none; }
+
+    /* Modal de comparação de lojas */
+    .promo-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 60;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .promo-modal-overlay.ativo { display: flex; }
+    .promo-modal {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 460px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 22px;
+    }
+    .promo-modal h3 {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+    .promo-modal .promo-modal-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .promo-store-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 0;
+      border-top: 1px solid var(--border-color);
+      font-size: 13px;
+    }
+    .promo-store-row:first-of-type { border-top: none; }
+    .promo-store-row .preco { font-weight: 800; color: var(--text-main); }
+    .promo-store-row a {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-accent);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .promo-modal-close {
+      margin-top: 16px;
+      width: 100%;
+      padding: 9px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .promo-loadmore {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: center;
+      padding: 8px 0 4px;
+    }
+    .promo-loadmore button {
+      padding: 10px 22px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: rgba(139, 92, 246, 0.1);
+      color: var(--text-accent);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .promo-loadmore button:disabled { opacity: 0.5; cursor: default; }
+
     /* RESPONSIVIDADE */
     @media (max-width: 900px) {
       .sidebar {
@@ -1556,6 +1698,14 @@
             <line x1="17" y1="7" x2="22" y2="7"/>
           </svg>
           <span>Catálogo Filmes</span>
+        </button>
+
+        <button class="nav-item" data-secao="promocoes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+            <line x1="7" y1="7" x2="7.01" y2="7"/>
+          </svg>
+          <span>Promoções</span>
         </button>
 
         <button class="nav-item" data-secao="watchlist">
@@ -1674,12 +1824,12 @@
                 <div class="prompt-card-desc">Confira os filmes mais aguardados que estão prestes a chegar às telonas.</div>
               </div>
 
-              <div class="prompt-card" data-prompt="Quais são as principais promoções, ofertas e descontos imperdíveis de games e cinema desta semana?">
+              <div class="prompt-card" data-secao="promocoes">
                 <div class="prompt-card-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
                 </div>
-                <div class="prompt-card-title">Promoções da Semana</div>
-                <div class="prompt-card-desc">As principais ofertas e descontos imperdíveis de jogos e filmes.</div>
+                <div class="prompt-card-title">Promoções de Jogos</div>
+                <div class="prompt-card-desc">Ofertas atuais de jogos de PC com comparação de preço entre lojas.</div>
               </div>
             </div>
           </div>
@@ -1722,6 +1872,39 @@
         </div>
 
         <div class="catalogo-grid" id="gridFilmes"></div>
+      </section>
+
+      <!-- VIEW: PROMOÇÕES DE JOGOS (dados do backend /api/deals — fonte CheapShark) -->
+      <section class="view-secao" id="viewPromocoes" style="display: none;">
+        <div class="secao-header">
+          <div class="secao-titulo-wrap">
+            <h2>Promoções de Jogos</h2>
+            <p>Ofertas atuais de jogos de PC, com comparação de preço entre lojas. Dados via backend Neon.</p>
+          </div>
+        </div>
+
+        <div class="promo-toolbar">
+          <input type="text" id="promoBusca" placeholder="Buscar jogo pelo nome (ex.: Cyberpunk 2077)..." autocomplete="off" />
+          <select id="promoLoja">
+            <option value="">Todas as lojas</option>
+          </select>
+          <select id="promoOrdem">
+            <option value="dealRating">Melhores ofertas</option>
+            <option value="savings">Maior desconto</option>
+            <option value="price">Menor preço</option>
+            <option value="metacritic">Melhor avaliação</option>
+            <option value="recent">Mais recentes</option>
+          </select>
+          <select id="promoPreco">
+            <option value="">Qualquer preço</option>
+            <option value="25">Até R$ 25</option>
+            <option value="50">Até R$ 50</option>
+            <option value="100">Até R$ 100</option>
+            <option value="150">Até R$ 150</option>
+          </select>
+        </div>
+
+        <div class="catalogo-grid" id="gridPromocoes"></div>
       </section>
 
       <!-- VIEW 4: WATCHLIST -->
@@ -1775,6 +1958,16 @@
       </section>
 
     </main>
+  </div>
+
+  <!-- Modal de comparação de lojas de um jogo (Promoções) -->
+  <div class="promo-modal-overlay" id="promoModalOverlay">
+    <div class="promo-modal" id="promoModal">
+      <h3 id="promoModalTitulo">Comparar lojas</h3>
+      <div class="promo-modal-sub" id="promoModalSub"></div>
+      <div id="promoModalLista"></div>
+      <button class="promo-modal-close" id="promoModalClose">Fechar</button>
+    </div>
   </div>
 
   <script>
@@ -1896,6 +2089,7 @@
     const viewChat = document.getElementById("viewChat");
     const viewJogos = document.getElementById("viewJogos");
     const viewFilmes = document.getElementById("viewFilmes");
+    const viewPromocoes = document.getElementById("viewPromocoes");
     const viewWatchlist = document.getElementById("viewWatchlist");
     const viewConfiguracoes = document.getElementById("viewConfiguracoes");
     
@@ -1947,13 +2141,15 @@
       gamepad: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M6 11h4M8 9v4"/><circle cx="15" cy="12" r="0.75" fill="currentColor"/><circle cx="17.5" cy="10" r="0.75" fill="currentColor"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.106-.017.158L2 15a4 4 0 0 0 4 4c1.23 0 2.29-.65 2.87-1.63L10 15h4l1.13 2.37A3.992 3.992 0 0 0 18 19a4 4 0 0 0 4-4l-.685-6.252A4 4 0 0 0 17.32 5z"/></svg>`,
       film: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>`,
       bookmark: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`,
-      gear: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`
+      gear: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+      tag: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`
     };
 
     const SECOES = {
       assistente: { titulo: "Neon", desc: "Sua especialista em cultura pop", icone: SVG_ICONS.pixelAvatar, tag: "GAMES & CINEMA" },
       jogos: { titulo: "Catálogo de Games", desc: "Os títulos mais aclamados do universo gamer", icone: SVG_ICONS.gamepad, tag: "GAMES" },
       filmes: { titulo: "Catálogo de Cinema", desc: "Grandes produções e indicações de filmes", icone: SVG_ICONS.film, tag: "CINEMA" },
+      promocoes: { titulo: "Promoções de Jogos", desc: "Ofertas atuais de jogos de PC e comparação de preços", icone: SVG_ICONS.tag, tag: "OFERTAS" },
       watchlist: { titulo: "Minha Watchlist", desc: "Seus filmes e jogos salvos para ver depois", icone: SVG_ICONS.bookmark, tag: "SALVOS" },
       configuracoes: { titulo: "Configurações", desc: "Ajustes de visual e preferências", icone: SVG_ICONS.gear, tag: "SISTEMA" }
     };
@@ -1973,6 +2169,7 @@
       viewChat.style.display = id === "assistente" ? "flex" : "none";
       viewJogos.style.display = id === "jogos" ? "flex" : "none";
       viewFilmes.style.display = id === "filmes" ? "flex" : "none";
+      viewPromocoes.style.display = id === "promocoes" ? "flex" : "none";
       viewWatchlist.style.display = id === "watchlist" ? "flex" : "none";
       viewConfiguracoes.style.display = id === "configuracoes" ? "flex" : "none";
 
@@ -1986,6 +2183,7 @@
         }
         carregarCatalogo(tipo);
       }
+      if (id === "promocoes") iniciarPromocoes();
       if (id === "watchlist") renderizarWatchlist();
 
       fecharSidebarMobile();
@@ -2047,8 +2245,15 @@
         `;
 
         card.querySelector('.btn-pedir').addEventListener('click', () => {
+          // Jogo ou filme? Pela aba (gridJogos/gridFilmes) ou pelo id na watchlist
+          // (jogos: "g-"/"j..."; filmes: "m-"/"f...").
+          const ehJogo =
+            elementId === "gridJogos" ||
+            (elementId !== "gridFilmes" && /^[gj]/i.test(String(item.id || "")));
+          const oQue = ehJogo ? "o jogo" : "o filme";
+          const genero = item.genero ? ` (${item.genero})` : "";
           selecionarSecao('assistente');
-          enviarPromptDireto(`Me fale tudo sobre ${item.titulo} (${item.genero}). Por que vale a pena assistir/jogar e quais são os destaques?`);
+          enviarPromptDireto(`Me fale sobre ${oQue} ${item.titulo}${genero}. Do que se trata, quais são os destaques e por que vale a pena?`);
         });
 
         card.querySelector('.btn-card-icon').addEventListener('click', () => {
@@ -2078,6 +2283,339 @@
       }
 
       renderizarCatalogo(watchlist, "gridWatchlist");
+    }
+
+    /* ------------------------------------------------- */
+    /* PROMOÇÕES DE JOGOS                                */
+    /* Consome só o backend Neon: /api/deals, /api/deals/top,             */
+    /* /api/games/search e /api/games/:id/deals. A CheapShark fica        */
+    /* escondida atrás do backend — o frontend nunca fala com ela.        */
+    /* ------------------------------------------------- */
+    const promoState = {
+      iniciado: false,
+      modo: "deals",        // "deals" (lista geral) ou "busca" (por nome)
+      pagina: 0,
+      limit: 20,
+      carregando: false,
+      fim: false,
+      itens: [],
+      filtros: { busca: "", loja: "", ordem: "dealRating", preco: "" }
+    };
+
+    function escHtml(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+      );
+    }
+
+    // Preços vêm do backend já convertidos para Real (BRL).
+    const fmtBRL = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+    function precoBRL(n) {
+      return n == null || isNaN(n) ? "—" : fmtBRL.format(Number(n));
+    }
+
+    // Remove itens repetidos. Em "deals" a chave é jogo + loja (o mesmo jogo em
+    // lojas diferentes é mantido de propósito). Em "busca" não há loja, então a
+    // chave é só o título. Em empate, fica o de menor preço.
+    function dedupePromo(lista, modo) {
+      const precoDe = (it) =>
+        (it.pricing && it.pricing.sale != null ? it.pricing.sale : it.cheapestPrice);
+      const vistos = new Map();
+      const out = [];
+      (lista || []).forEach((it) => {
+        const titulo = (it.title || "").trim().toLowerCase();
+        const loja = it.store && it.store.id ? String(it.store.id) : "";
+        const chave = modo === "busca" ? titulo : titulo + "|" + loja;
+        if (!vistos.has(chave)) {
+          vistos.set(chave, out.length);
+          out.push(it);
+          return;
+        }
+        const i = vistos.get(chave);
+        const atual = precoDe(out[i]);
+        const novo = precoDe(it);
+        if (novo != null && (atual == null || novo < atual)) out[i] = it;
+      });
+      return out;
+    }
+
+    // GET no backend Neon. Devolve o corpo padrão { success, data, pagination }.
+    async function promoGet(caminho, params) {
+      const qs = new URLSearchParams();
+      Object.entries(params || {}).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== "") qs.set(k, v);
+      });
+      const url = API_BASE + caminho + (qs.toString() ? "?" + qs.toString() : "");
+      const r = await fetch(url, { headers: apiHeaders() });
+      let corpo = null;
+      try { corpo = await r.json(); } catch (e) { corpo = null; }
+      if (!r.ok || !corpo || corpo.success === false) {
+        const msg = (corpo && corpo.error && corpo.error.message) ||
+          "Não foi possível carregar as promoções.";
+        throw new Error(msg);
+      }
+      return corpo;
+    }
+
+    // 1ª entrada na aba: prepara os selects e escuta os filtros.
+    async function iniciarPromocoes() {
+      if (!promoState.iniciado) {
+        promoState.iniciado = true;
+
+        const selLoja = document.getElementById("promoLoja");
+        try {
+          const { data } = await promoGet("/api/stores", { active: 1 });
+          (data || []).forEach((loja) => {
+            const opt = document.createElement("option");
+            opt.value = loja.id;
+            opt.textContent = loja.name || ("Loja " + loja.id);
+            selLoja.appendChild(opt);
+          });
+        } catch (e) { /* sem lista de lojas o filtro só fica vazio */ }
+
+        const busca = document.getElementById("promoBusca");
+        let debounce;
+        busca.addEventListener("input", () => {
+          clearTimeout(debounce);
+          debounce = setTimeout(() => {
+            promoState.filtros.busca = busca.value.trim();
+            recarregarPromocoes();
+          }, 400);
+        });
+
+        selLoja.addEventListener("change", (e) => {
+          promoState.filtros.loja = e.target.value;
+          recarregarPromocoes();
+        });
+        document.getElementById("promoOrdem").addEventListener("change", (e) => {
+          promoState.filtros.ordem = e.target.value;
+          recarregarPromocoes();
+        });
+        document.getElementById("promoPreco").addEventListener("change", (e) => {
+          promoState.filtros.preco = e.target.value;
+          recarregarPromocoes();
+        });
+
+        // Modal de comparação de lojas.
+        document.getElementById("promoModalClose").addEventListener("click", fecharComparacao);
+        document.getElementById("promoModalOverlay").addEventListener("click", (e) => {
+          if (e.target.id === "promoModalOverlay") fecharComparacao();
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") fecharComparacao();
+        });
+
+        recarregarPromocoes();
+      } else if (!promoState.itens.length && !promoState.carregando) {
+        recarregarPromocoes();
+      }
+    }
+
+    function recarregarPromocoes() {
+      promoState.pagina = 0;
+      promoState.fim = false;
+      promoState.itens = [];
+      mensagemNoGrid("gridPromocoes", "Carregando promoções…");
+      carregarMaisPromocoes();
+    }
+
+    async function carregarMaisPromocoes() {
+      if (promoState.carregando || promoState.fim) return;
+      promoState.carregando = true;
+
+      const f = promoState.filtros;
+      try {
+        if (f.busca) {
+          // Modo busca: nome digitado pelo usuário.
+          promoState.modo = "busca";
+          const corpo = await promoGet("/api/games/search", { q: f.busca, limit: 24 });
+          promoState.itens = dedupePromo(corpo.data || [], "busca");
+          promoState.fim = true;
+        } else {
+          // Modo lista: promoções gerais paginadas.
+          promoState.modo = "deals";
+          const corpo = await promoGet("/api/deals", {
+            page: promoState.pagina,
+            limit: promoState.limit,
+            sort: f.ordem,
+            onSale: 1,
+            store: f.loja || undefined,
+            upperPrice: f.preco || undefined
+          });
+          // Junta com o que já tinha e remove repetidos (mesmo jogo + mesma loja),
+          // inclusive os que cruzam páginas. Jogo em lojas diferentes fica.
+          promoState.itens = dedupePromo(promoState.itens.concat(corpo.data || []), "deals");
+          promoState.fim = !(corpo.pagination && corpo.pagination.hasMore);
+          promoState.pagina += 1;
+        }
+        renderPromocoes();
+      } catch (e) {
+        mensagemNoGrid(
+          "gridPromocoes",
+          escHtml(e.message) + "<br><span style=\"font-size:12px;\">Confira se o servidor Neon está rodando na porta 3000.</span>"
+        );
+      } finally {
+        promoState.carregando = false;
+      }
+    }
+
+    function cardPromoHTML(item) {
+      const pricing = item.pricing || null;
+      const desconto = pricing && pricing.discountPercent > 0 ? pricing.discountPercent : 0;
+      const fallbacks = Array.isArray(item.thumbnailFallback)
+        ? item.thumbnailFallback
+        : item.thumbnailFallback ? [item.thumbnailFallback] : [];
+      const thumb = item.thumbnail || fallbacks[0] || "";
+      const fila = fallbacks.filter((u) => u && u !== thumb);
+      const store = item.store || null;
+      const steam = item.ratings && item.ratings.steam ? "★ " + item.ratings.steam : "";
+
+      const badge = desconto ? `<span class="deal-badge">-${desconto}%</span>` : "";
+      const capa = thumb
+        ? `<img src="${escHtml(thumb)}"${fila.length ? ` data-fallback="${escHtml(fila.join(" "))}"` : ""} alt="${escHtml(item.title)}" class="media-thumb" loading="lazy" />`
+        : `<div class="media-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:12px;">sem capa</div>`;
+
+      const linhaLoja = store && store.name
+        ? `<span class="deal-store">${store.logo ? `<img src="${escHtml(store.logo)}" alt="" />` : ""}${escHtml(store.name)}</span>`
+        : "";
+
+      let precos;
+      if (pricing) {
+        precos = `<div class="deal-prices">
+            ${pricing.normal != null && pricing.normal !== pricing.sale ? `<span class="deal-old">${precoBRL(pricing.normal)}</span>` : ""}
+            <span class="deal-new">${precoBRL(pricing.sale)}</span>
+          </div>`;
+      } else {
+        precos = `<div class="deal-prices"><span class="deal-new">${precoBRL(item.cheapestPrice)}</span>
+            <span class="deal-old" style="text-decoration:none;">menor preço</span></div>`;
+      }
+
+      // Contexto da promoção para a IA usar na resposta.
+      const preco = pricing ? pricing.sale : item.cheapestPrice;
+      const ctx = [];
+      if (preco != null) ctx.push((pricing ? "em promoção por " : "a partir de ") + precoBRL(preco));
+      if (store && store.name) ctx.push("na " + store.name);
+      if (desconto) ctx.push(`com ${desconto}% de desconto`);
+
+      const perguntarIA = `<button class="btn-card-action btn-promo-pergunta" data-titulo="${escHtml(item.title || "")}" data-contexto="${escHtml(ctx.join(" "))}">Perguntar à IA</button>`;
+
+      const comparar = item.gameId
+        ? `<button class="btn-card-icon btn-comparar" title="Comparar lojas e ver a oferta" data-game="${escHtml(item.gameId)}" data-titulo="${escHtml(item.title)}">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+           </button>`
+        : "";
+
+      return `
+        <div class="media-card">
+          <div class="media-thumb-container">
+            ${capa}
+            ${badge}
+            ${steam ? `<span class="media-badge">${escHtml(steam)}</span>` : ""}
+          </div>
+          <div class="media-content">
+            <h4 class="media-title">${escHtml(item.title) || "Sem título"}</h4>
+            <div class="media-info">${linhaLoja}</div>
+            ${precos}
+            <div class="media-actions">
+              ${perguntarIA}
+              ${comparar}
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function renderPromocoes() {
+      const grid = document.getElementById("gridPromocoes");
+      if (!grid) return;
+
+      if (!promoState.itens.length) {
+        mensagemNoGrid("gridPromocoes", "Nenhuma promoção encontrada com esses filtros.");
+        return;
+      }
+
+      let html = promoState.itens.map(cardPromoHTML).join("");
+      if (promoState.modo === "deals" && !promoState.fim) {
+        html += `<div class="promo-loadmore"><button id="promoLoadMore">Carregar mais</button></div>`;
+      }
+      grid.innerHTML = html;
+
+      const btnMais = document.getElementById("promoLoadMore");
+      if (btnMais) {
+        btnMais.addEventListener("click", () => {
+          btnMais.disabled = true;
+          btnMais.textContent = "Carregando…";
+          carregarMaisPromocoes();
+        });
+      }
+
+      grid.querySelectorAll(".btn-comparar").forEach((b) => {
+        b.addEventListener("click", () => abrirComparacao(b.dataset.game, b.dataset.titulo));
+      });
+
+      // "Perguntar à IA": abre o chat e pede para a Neon falar sobre o jogo,
+      // já com o contexto da promoção (preço, loja, desconto).
+      grid.querySelectorAll(".btn-promo-pergunta").forEach((b) => {
+        b.addEventListener("click", () => {
+          const titulo = b.dataset.titulo || "esse jogo";
+          const ctx = b.dataset.contexto ? ` (está ${b.dataset.contexto})` : "";
+          selecionarSecao("assistente");
+          enviarPromptDireto(
+            `Me fale sobre o jogo ${titulo}${ctx}. Do que se trata, qual o gênero, quais os destaques e o que esperar dele? Vale a pena?`
+          );
+        });
+      });
+
+      // Se a imagem HD (capa grande da Steam / asset original da GOG) não existir
+      // para aquele jogo, tenta as alternativas em ordem; a última é a miniatura
+      // original da CheapShark, que sempre existe.
+      grid.querySelectorAll("img.media-thumb[data-fallback]").forEach((img) => {
+        const fila = img.dataset.fallback.split(" ").filter(Boolean);
+        img.addEventListener("error", function aoFalhar() {
+          const proxima = fila.shift();
+          if (proxima) {
+            img.setAttribute("src", proxima);
+          } else {
+            img.removeEventListener("error", aoFalhar);
+            img.style.visibility = "hidden";
+          }
+        });
+      });
+    }
+
+    // ----- Modal: comparar preços do mesmo jogo em cada loja -----
+    async function abrirComparacao(gameId, titulo) {
+      const overlay = document.getElementById("promoModalOverlay");
+      document.getElementById("promoModalTitulo").textContent = titulo || "Comparar lojas";
+      document.getElementById("promoModalSub").textContent = "Carregando ofertas…";
+      document.getElementById("promoModalLista").innerHTML = "";
+      overlay.classList.add("ativo");
+
+      try {
+        const { data } = await promoGet("/api/games/" + encodeURIComponent(gameId) + "/deals", {});
+        const deals = (data && data.deals) || [];
+        const menorEver = data && data.cheapestPriceEver;
+        document.getElementById("promoModalSub").textContent = menorEver && menorEver.price != null
+          ? `Menor preço já registrado: ${precoBRL(menorEver.price)}`
+          : `${deals.length} loja(s) com oferta`;
+
+        document.getElementById("promoModalLista").innerHTML = deals.length
+          ? deals.map((d) => {
+              const nome = (d.store && d.store.name) || ("Loja " + (d.store && d.store.id));
+              const pct = d.pricing && d.pricing.discountPercent > 0 ? ` (-${d.pricing.discountPercent}%)` : "";
+              return `<div class="promo-store-row">
+                <span>${escHtml(nome)}</span>
+                <span class="preco">${precoBRL(d.pricing && d.pricing.sale)}${pct}</span>
+                ${d.redirectUrl ? `<a href="${escHtml(d.redirectUrl)}" target="_blank" rel="noopener">Ver oferta</a>` : ""}
+              </div>`;
+            }).join("")
+          : `<div class="promo-modal-sub">Nenhuma oferta disponível para este jogo agora.</div>`;
+      } catch (e) {
+        document.getElementById("promoModalSub").textContent = e.message;
+      }
+    }
+
+    function fecharComparacao() {
+      document.getElementById("promoModalOverlay").classList.remove("ativo");
     }
 
     /* ------------------------------------------------- */
@@ -2410,6 +2948,10 @@
     /* PROMPT CARDS HERO CLICK */
     document.querySelectorAll(".prompt-card").forEach((card) => {
       card.addEventListener("click", () => {
+        if (card.dataset.secao) {
+          selecionarSecao(card.dataset.secao);
+          return;
+        }
         const promptText = card.dataset.prompt;
         if (promptText) enviarPromptDireto(promptText);
       });
