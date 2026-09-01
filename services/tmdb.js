@@ -191,3 +191,51 @@ export async function seriesPopulares() {
   const data = await tmdbFetch("/tv/popular", { page: 1 });
   return resumirLista(data.results, "serie");
 }
+
+// ---------- Catálogo para o frontend (cards com pôster) ----------
+
+// As listas de descoberta trazem só `genre_ids`; o nome vem de /genre/movie/list.
+// Guardamos o mapa em memória por 24h (a lista muda raríssimas vezes).
+let generoCache = { mapa: null, expiraEm: 0 };
+
+async function mapaDeGeneros() {
+  if (generoCache.mapa && Date.now() < generoCache.expiraEm) return generoCache.mapa;
+  const data = await tmdbFetch("/genre/movie/list");
+  const mapa = new Map((data.genres || []).map((g) => [g.id, g.name]));
+  generoCache = { mapa, expiraEm: Date.now() + 24 * 60 * 60 * 1000 };
+  return mapa;
+}
+
+// Filmes mais bem avaliados, com pôster, no formato que o frontend já espera:
+// { id, titulo, ano, nota, genero, cover }
+export async function catalogoFilmes({ limite = 12 } = {}) {
+  const n = Math.min(Math.max(Number(limite) || 12, 1), 24);
+  // /movie/top_rated hoje vem poluído com filmes obscuros de nota perfeita e
+  // pouquíssimos votos. /discover com um piso de votos traz os clássicos
+  // realmente aclamados.
+  const [data, generos] = await Promise.all([
+    tmdbFetch("/discover/movie", {
+      sort_by: "vote_average.desc",
+      "vote_count.gte": 3000,
+      include_adult: false,
+      page: 1
+    }),
+    mapaDeGeneros().catch(() => new Map())
+  ]);
+  return (data.results || [])
+    .filter((f) => f.poster_path)
+    .slice(0, n)
+    .map((f) => ({
+      id: `m-${f.id}`,
+      titulo: f.title || f.original_title || "Sem título",
+      ano: (f.release_date || "").slice(0, 4) || null,
+      nota: f.vote_average ? `★ ${f.vote_average.toFixed(1)}` : "★ –",
+      genero:
+        (f.genre_ids || [])
+          .map((id) => generos.get(id))
+          .filter(Boolean)
+          .slice(0, 2)
+          .join(" / ") || "Filme",
+      cover: IMG_BASE + f.poster_path
+    }));
+}

@@ -21,6 +21,8 @@ import { conversationStore, MAX_MENSAGENS } from "./chat/context.js";
 import { historyStore, MAX_CONVERSAS } from "./chat/historyStore.js";
 import { rotearMensagem } from "./chat/router.js";
 import { gerarResposta } from "./services/openai.js";
+import * as tmdb from "./services/tmdb.js";
+import * as igdb from "./services/igdb.js";
 import { mensagemErroAleatoria, registrarErroInterno } from "./chat/errors.js";
 
 dotenv.config();
@@ -186,6 +188,47 @@ app.delete("/conversations/:id", (req, res) => {
   }
   res.json({ ok: true });
 });
+
+// ---------------------------------------------------------------------------
+// Catálogos (jogos e filmes) para as abas de descoberta do frontend.
+// Os dados vêm da IGDB (jogos) e da TMDB (filmes). Como um catálogo muda pouco
+// e as APIs têm limite de uso, guardamos o resultado em memória por 6 horas.
+// ---------------------------------------------------------------------------
+
+const CATALOGO_TTL_MS = 6 * 60 * 60 * 1000;
+const catalogoCache = new Map(); // chave -> { dados, expiraEm }
+
+async function servirCatalogo(res, chave, configurado, carregar) {
+  if (!configurado) {
+    return res.json({ items: [], configurado: false });
+  }
+
+  const cache = catalogoCache.get(chave);
+  if (cache && Date.now() < cache.expiraEm) {
+    return res.json({ items: cache.dados, configurado: true, cache: true });
+  }
+
+  try {
+    const dados = await carregar();
+    catalogoCache.set(chave, { dados, expiraEm: Date.now() + CATALOGO_TTL_MS });
+    res.json({ items: dados, configurado: true, cache: false });
+  } catch (erro) {
+    registrarErroInterno(`server./catalog/${chave}`, erro);
+    // Se ainda houver um resultado antigo em cache, devolve ele em vez de falhar.
+    if (cache) {
+      return res.json({ items: cache.dados, configurado: true, cache: true, stale: true });
+    }
+    res.status(502).json({ items: [], configurado: true, erro: true });
+  }
+}
+
+app.get("/catalog/games", (req, res) =>
+  servirCatalogo(res, "games", igdb.igdbConfigurado(), () => igdb.catalogoJogos({ limite: 12 }))
+);
+
+app.get("/catalog/movies", (req, res) =>
+  servirCatalogo(res, "movies", tmdb.tmdbConfigurado(), () => tmdb.catalogoFilmes({ limite: 12 }))
+);
 
 app.listen(3000, () => {
   console.log("Servidor Neon AI rodando na porta 3000");

@@ -332,3 +332,77 @@ export async function jogosPopulares() {
   const dados = await igdbQuery("games", corpo);
   return (Array.isArray(dados) ? dados : []).map(normalizarResumo).map(limparResumo);
 }
+
+// ---------- Catálogo para o frontend (cards com capa) ----------
+
+// A IGDB serve as imagens em https://images.igdb.com/igdb/image/upload/t_<tamanho>/<image_id>.jpg
+function capaDoJogo(imageId) {
+  return imageId
+    ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${imageId}.jpg`
+    : null;
+}
+
+function anoDoUnix(segundos) {
+  if (!segundos && segundos !== 0) return null;
+  const d = new Date(segundos * 1000);
+  return Number.isNaN(d.getTime()) ? null : d.getUTCFullYear();
+}
+
+// A IGDB não localiza gêneros; traduzimos os mais comuns para o card em pt-BR.
+const GENERO_PT = {
+  "Role-playing (RPG)": "RPG",
+  "Turn-based strategy (TBS)": "Estratégia por turnos",
+  "Real Time Strategy (RTS)": "Estratégia em tempo real",
+  Adventure: "Aventura",
+  Shooter: "Tiro",
+  Platform: "Plataforma",
+  Puzzle: "Puzzle",
+  Racing: "Corrida",
+  Fighting: "Luta",
+  Simulator: "Simulação",
+  Strategy: "Estratégia",
+  Tactical: "Tático",
+  "Hack and slash/Beat 'em up": "Hack and slash",
+  "Point-and-click": "Point-and-click",
+  Indie: "Indie",
+  Arcade: "Arcade",
+  "Card & Board Game": "Cartas e tabuleiro",
+  "Music": "Música",
+  "Sport": "Esporte",
+  "Quiz/Trivia": "Quiz",
+  "Visual Novel": "Visual Novel",
+  "Pinball": "Pinball",
+  "MOBA": "MOBA"
+};
+
+function generoPt(nome) {
+  return GENERO_PT[nome] || nome;
+}
+
+// Monta o card no mesmo formato que o frontend já espera:
+// { id, titulo, ano, nota, genero, cover }
+function normalizarCard(j) {
+  const nota100 = j.rating ?? j.aggregated_rating ?? null;
+  return {
+    id: `g-${j.id}`,
+    titulo: j.name || "Sem título",
+    ano: anoDoUnix(j.first_release_date),
+    nota: nota100 != null ? `★ ${(nota100 / 10).toFixed(1)}` : "★ –",
+    genero: nomes(j.genres).slice(0, 2).map(generoPt).join(" / ") || "Jogo",
+    cover: capaDoJogo(j.cover?.image_id)
+  };
+}
+
+// Jogos mais aclamados (muitos votos + nota alta), com capa, para o "Catálogo
+// de Games em Destaque".
+export async function catalogoJogos({ limite = 12 } = {}) {
+  const n = Math.min(Math.max(Number(limite) || 12, 1), 24);
+  const corpo =
+    "fields name,first_release_date,genres.name,rating,aggregated_rating,rating_count,cover.image_id,game_type; " +
+    `where rating_count > 200 & rating != null & cover != null & game_type = ${TIPOS_REAL_LISTA}; ` +
+    `sort rating_count desc; limit ${n};`;
+  const dados = await igdbQuery("games", corpo);
+  return (Array.isArray(dados) ? dados : [])
+    .map(normalizarCard)
+    .filter((c) => c.cover);
+}

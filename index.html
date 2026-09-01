@@ -98,6 +98,7 @@
     [data-theme="light"] .secao-titulo-wrap h2 {
       background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 50%, #a855f7 100%);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -242,7 +243,6 @@
     [data-theme="light"] .theme-toggle-btn:not(.ativo) svg * {
       color: #8b5cf6 !important;
       stroke: #8b5cf6 !important;
-    }rtant;
     }
 
     [data-theme="light"] .prompt-card {
@@ -350,6 +350,7 @@
       letter-spacing: -0.6px;
       background: var(--primary-gradient);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
       line-height: 1.1;
     }
@@ -635,11 +636,35 @@
       font-weight: 600;
     }
 
-    .hist-item .item-titulo {
+    .hist-item .item-conteudo {
       flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .hist-item .item-titulo {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .hist-item .item-sub {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      opacity: 0.7;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .hist-vazio {
+      padding: 10px 14px 10px 24px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--text-muted);
     }
 
     .item-excluir {
@@ -883,6 +908,7 @@
       margin-bottom: 14px;
       background: var(--primary-gradient);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -1215,6 +1241,7 @@
       font-weight: 800;
       background: var(--primary-gradient);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -1588,6 +1615,8 @@
             <p id="headerDesc">Sua especialista em cultura pop</p>
           </div>
         </div>
+
+        <span class="header-tag" id="headerTag">GAMES & CINEMA</span>
       </header>
 
       <!-- VIEW 1: CHAT -->
@@ -1750,7 +1779,10 @@
 
   <script>
     /* ------------------------------------------------- */
-    /* DADOS FICTÍCIOS DE CATÁLOGO (IMAGENS & INFOS)      */
+    /* CATÁLOGO — FALLBACK                                */
+    /* Usado só quando o backend (IGDB/TMDB) não responde */
+    /* ou não está configurado. O catálogo real é buscado */
+    /* em /catalog/games e /catalog/movies.              */
     /* ------------------------------------------------- */
     const JOGOS_DATA = [
       { id: 'j1', titulo: 'Elden Ring', ano: '2022', nota: '★ 9.6', genero: 'RPG / Souls-like', cover: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=600&auto=format&fit=crop&q=80' },
@@ -1766,11 +1798,66 @@
       { id: 'f4', titulo: 'Oppenheimer', ano: '2023', nota: '★ 8.9', genero: 'Biografia / Histórico', cover: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=600&auto=format&fit=crop&q=80' }
     ];
 
+    /* Estado do catálogo carregado do backend. status: idle | carregando | ok | erro */
+    const catalogoState = {
+      jogos: { status: "idle", dados: [], rota: "/catalog/games", grid: "gridJogos", fallback: JOGOS_DATA },
+      filmes: { status: "idle", dados: [], rota: "/catalog/movies", grid: "gridFilmes", fallback: FILMES_DATA }
+    };
+
+    // Dados a exibir agora: os do backend se já vieram, senão o fallback.
+    function dadosCatalogo(tipo) {
+      const st = catalogoState[tipo];
+      return st.dados.length ? st.dados : st.fallback;
+    }
+
+    // Mensagem full-width dentro do grid (carregando / erro).
+    function mensagemNoGrid(gridId, texto) {
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px;">
+          ${texto}
+        </div>`;
+    }
+
+    // Busca o catálogo real uma vez por sessão. Em caso de falha/lista vazia,
+    // cai no fallback fictício sem quebrar a tela.
+    async function carregarCatalogo(tipo) {
+      const st = catalogoState[tipo];
+      if (st.status === "carregando" || st.status === "ok") return;
+      st.status = "carregando";
+
+      const secaoVisivel = () =>
+        (tipo === "jogos" && viewJogos.style.display !== "none") ||
+        (tipo === "filmes" && viewFilmes.style.display !== "none");
+
+      if (secaoVisivel() && !st.dados.length) {
+        mensagemNoGrid(st.grid, "Carregando catálogo…");
+      }
+
+      try {
+        const r = await fetch(API_BASE + st.rota, { headers: apiHeaders() });
+        const d = await r.json();
+        const items = Array.isArray(d.items) ? d.items.filter((i) => i && i.cover) : [];
+        st.dados = items;
+        st.status = "ok";
+      } catch (e) {
+        st.status = "erro";
+      }
+
+      if (secaoVisivel()) renderizarCatalogo(dadosCatalogo(tipo), st.grid);
+    }
+
     /* ------------------------------------------------- */
     /* ESTADO DA APLICAÇÃO                               */
     /* ------------------------------------------------- */
     let conversas = [];
     let conversaAtual = null;
+    // "carregando" enquanto a 1ª busca não volta; "erro" se o backend não respondeu.
+    let historicoStatus = "carregando";
+    // Abre a lista do "Histórico" sozinha na 1ª vez que houver conversas; depois
+    // respeita o que o usuário escolher (recolher/expandir).
+    let historicoAutoAberto = false;
     let watchlist = JSON.parse(localStorage.getItem('playcine-watchlist') || '[]');
 
     /* ------------------------------------------------- */
@@ -1889,8 +1976,16 @@
       viewWatchlist.style.display = id === "watchlist" ? "flex" : "none";
       viewConfiguracoes.style.display = id === "configuracoes" ? "flex" : "none";
 
-      if (id === "jogos") renderizarCatalogo(JOGOS_DATA, "gridJogos");
-      if (id === "filmes") renderizarCatalogo(FILMES_DATA, "gridFilmes");
+      if (id === "jogos" || id === "filmes") {
+        const tipo = id;
+        const st = catalogoState[tipo];
+        // Já temos algo (real ou fallback de tentativa anterior): pinta na hora.
+        // 1ª visita: deixa o carregarCatalogo mostrar "Carregando…".
+        if (st.status === "ok" || st.status === "erro") {
+          renderizarCatalogo(dadosCatalogo(tipo), st.grid);
+        }
+        carregarCatalogo(tipo);
+      }
       if (id === "watchlist") renderizarWatchlist();
 
       fecharSidebarMobile();
@@ -1913,8 +2008,8 @@
       localStorage.setItem('playcine-watchlist', JSON.stringify(watchlist));
       
       // Atualizar grids visíveis
-      if (viewJogos.style.display !== "none") renderizarCatalogo(JOGOS_DATA, "gridJogos");
-      if (viewFilmes.style.display !== "none") renderizarCatalogo(FILMES_DATA, "gridFilmes");
+      if (viewJogos.style.display !== "none") renderizarCatalogo(dadosCatalogo("jogos"), "gridJogos");
+      if (viewFilmes.style.display !== "none") renderizarCatalogo(dadosCatalogo("filmes"), "gridFilmes");
       if (viewWatchlist.style.display !== "none") renderizarWatchlist();
     }
 
@@ -1925,17 +2020,18 @@
 
       dados.forEach(item => {
         const isSaved = watchlist.some(w => w.id === item.id);
+        const info = [item.ano, item.genero].filter(Boolean).join(" • ");
         const card = document.createElement("div");
         card.className = "media-card";
         card.innerHTML = `
           <div class="media-thumb-container">
-            <img src="${item.cover}" alt="${item.titulo}" class="media-thumb" />
-            <span class="media-badge">${item.nota}</span>
+            <img src="${item.cover}" alt="${item.titulo}" class="media-thumb" loading="lazy" />
+            <span class="media-badge">${item.nota || ""}</span>
           </div>
           <div class="media-content">
             <h4 class="media-title">${item.titulo}</h4>
             <div class="media-info">
-              <span>${item.ano}</span> • <span>${item.genero}</span>
+              ${info}
             </div>
             <div class="media-actions">
               <button class="btn-card-action btn-pedir">
@@ -1997,11 +2093,17 @@
           conversas = (d.conversations || []).slice(0, MAX_CONVERSAS).map((c) => ({
             id: c.id,
             titulo: c.title || "Nova conversa",
+            atualizadoEm: c.updatedAt || c.createdAt || null,
+            qtdMensagens: c.messageCount || 0,
             mensagens: null // carregadas sob demanda ao abrir a conversa
           }));
+          historicoStatus = "ok";
+        } else {
+          historicoStatus = "erro";
         }
       } catch (e) {
-        // Sem backend: mantém o que já estiver em memória.
+        // Sem backend: mantém o que já estiver em memória e sinaliza o erro.
+        historicoStatus = "erro";
       }
       // Se a conversa aberta foi removida no servidor (ex.: caiu pelo limite),
       // volta para um rascunho novo.
@@ -2092,15 +2194,33 @@
       return renderizarBolha(texto, tipo);
     }
 
+    // "há 5 min", "há 2 h", "há 3 d" ou a data para conversas mais antigas.
+    function tempoRelativo(iso) {
+      const t = iso ? Date.parse(iso) : NaN;
+      if (!t) return "";
+      const seg = Math.max(0, Math.floor((Date.now() - t) / 1000));
+      if (seg < 60) return "agora";
+      const min = Math.floor(seg / 60);
+      if (min < 60) return `há ${min} min`;
+      const h = Math.floor(min / 60);
+      if (h < 24) return `há ${h} h`;
+      const d = Math.floor(h / 24);
+      if (d < 7) return `há ${d} d`;
+      return new Date(t).toLocaleDateString("pt-BR");
+    }
+
     function renderizarHistorico() {
       historicoLista.innerHTML = "";
 
       if (conversas.length === 0) {
         const vazio = document.createElement("div");
-        vazio.style.padding = "10px 14px 10px 24px";
-        vazio.style.fontSize = "12px";
-        vazio.style.color = "var(--text-muted)";
-        vazio.textContent = "Nenhuma conversa ainda.";
+        vazio.className = "hist-vazio";
+        vazio.textContent =
+          historicoStatus === "erro"
+            ? "Não foi possível carregar o histórico. O servidor está ligado?"
+            : historicoStatus === "carregando"
+            ? "Carregando conversas…"
+            : "Nenhuma conversa ainda.";
         historicoLista.appendChild(vazio);
         return;
       }
@@ -2110,17 +2230,31 @@
         item.classList.add("hist-item");
         if (conversaAtual && conversaAtual.id === conv.id) item.classList.add("ativo");
 
+        const partesSub = [];
+        if (conv.qtdMensagens) partesSub.push(`${conv.qtdMensagens} msgs`);
+        const quando = tempoRelativo(conv.atualizadoEm);
+        if (quando) partesSub.push(quando);
+        const sub = partesSub.join(" · ");
+
         item.innerHTML = `
           <svg class="item-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          <span class="item-titulo">${conv.titulo}</span>
+          <span class="item-conteudo">
+            <span class="item-titulo"></span>
+            ${sub ? '<span class="item-sub"></span>' : ""}
+          </span>
           <span class="item-excluir" role="button" aria-label="Excluir">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
               <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
             </svg>
           </span>
         `;
+
+        // textContent (não innerHTML) para o título/subtítulo: evita quebrar o
+        // layout se a 1ª mensagem tiver "<", ">" ou "&".
+        item.querySelector(".item-titulo").textContent = conv.titulo;
+        if (sub) item.querySelector(".item-sub").textContent = sub;
 
         item.querySelector(".item-excluir").addEventListener("click", (e) => {
           e.stopPropagation();
@@ -2130,6 +2264,14 @@
         item.addEventListener("click", () => abrirConversa(conv.id));
         historicoLista.appendChild(item);
       });
+
+      // Na 1ª vez que aparecerem conversas, expande o painel sozinho para o
+      // histórico ficar visível sem precisar clicar. Depois disso respeita a
+      // escolha do usuário.
+      if (!historicoAutoAberto && conversas.length > 0) {
+        historicoAutoAberto = true;
+        abrirHistorico(true);
+      }
     }
 
     function abrirHistorico(forcar) {
