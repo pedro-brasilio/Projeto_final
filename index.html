@@ -1773,6 +1773,31 @@
     let conversaAtual = null;
     let watchlist = JSON.parse(localStorage.getItem('playcine-watchlist') || '[]');
 
+    /* ------------------------------------------------- */
+    /* BACKEND / HISTÓRICO PERSISTENTE                    */
+    /* ------------------------------------------------- */
+    const API_BASE = "http://localhost:3000";
+    const MAX_CONVERSAS = 5;
+
+    // O projeto não tem login. Geramos um id por dispositivo e o enviamos no
+    // header "x-user-id" para o backend saber de quem é cada conversa.
+    function obterUserId() {
+      let id = localStorage.getItem("playcine-user-id");
+      if (!id) {
+        id = "u-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
+        localStorage.setItem("playcine-user-id", id);
+      }
+      return id;
+    }
+    const USER_ID = obterUserId();
+
+    function apiHeaders(extra) {
+      return Object.assign(
+        { "Content-Type": "application/json", "x-user-id": USER_ID },
+        extra || {}
+      );
+    }
+
     /* DOM ELEMENTS */
     const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("overlay");
@@ -1962,19 +1987,30 @@
     /* ------------------------------------------------- */
     /* HISTÓRICO E MENSAGENS DO CHAT                     */
     /* ------------------------------------------------- */
-    function carregarConversas() {
+    // Busca a lista de conversas no backend (fonte da verdade, persistida em
+    // disco). Mantém no máximo as 5 mais recentes, da mais nova para a mais antiga.
+    async function recarregarHistorico() {
       try {
-        const salvo = localStorage.getItem("playcine-conversas");
-        if (salvo) conversas = JSON.parse(salvo);
+        const r = await fetch(API_BASE + "/conversations", { headers: apiHeaders() });
+        if (r.ok) {
+          const d = await r.json();
+          conversas = (d.conversations || []).slice(0, MAX_CONVERSAS).map((c) => ({
+            id: c.id,
+            titulo: c.title || "Nova conversa",
+            mensagens: null // carregadas sob demanda ao abrir a conversa
+          }));
+        }
       } catch (e) {
-        conversas = [];
+        // Sem backend: mantém o que já estiver em memória.
       }
-    }
-
-    function salvarConversas() {
-      try {
-        localStorage.setItem("playcine-conversas", JSON.stringify(conversas));
-      } catch (e) {}
+      // Se a conversa aberta foi removida no servidor (ex.: caiu pelo limite),
+      // volta para um rascunho novo.
+      if (conversaAtual && conversaAtual.id && !conversas.find((c) => c.id === conversaAtual.id)
+          && conversaAtual.mensagens && conversaAtual.mensagens.length > 0) {
+        criarConversaAtual();
+        renderizarMensagens();
+      }
+      renderizarHistorico();
     }
 
     function criarConversaAtual() {
@@ -2044,18 +2080,14 @@
     }
 
     function adicionarMensagem(texto, tipo) {
+      if (!conversaAtual.mensagens) conversaAtual.mensagens = [];
       conversaAtual.mensagens.push({ texto, tipo });
 
-      if (tipo === "usuario") {
-        if (conversaAtual.titulo === "Nova conversa") {
-          conversaAtual.titulo = texto.slice(0, 36) + (texto.length > 36 ? "..." : "");
-        }
-        if (!conversas.find((c) => c.id === conversaAtual.id)) {
-          conversas.push(conversaAtual);
-        }
+      // Título local imediato; o backend também deriva o seu ao persistir.
+      if (tipo === "usuario" && conversaAtual.titulo === "Nova conversa") {
+        conversaAtual.titulo = texto.slice(0, 36) + (texto.length > 36 ? "..." : "");
       }
 
-      salvarConversas();
       renderizarHistorico();
       return renderizarBolha(texto, tipo);
     }
@@ -2073,12 +2105,10 @@
         return;
       }
 
-      [...conversas].reverse().forEach((conv) => {
+      conversas.slice(0, MAX_CONVERSAS).forEach((conv) => {
         const item = document.createElement("button");
         item.classList.add("hist-item");
-        if (conversaAtual && conv.id === conv.id) {
-          if (conversaAtual.id === conv.id) item.classList.add("ativo");
-        }
+        if (conversaAtual && conversaAtual.id === conv.id) item.classList.add("ativo");
 
         item.innerHTML = `
           <svg class="item-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
@@ -2108,24 +2138,43 @@
       historicoLista.classList.toggle("aberto", abrir);
     }
 
-    function abrirConversa(id) {
-      const conv = conversas.find((c) => c.id === id);
+    async function abrirConversa(id) {
+      let conv = null;
+      try {
+        const r = await fetch(API_BASE + "/conversations/" + encodeURIComponent(id), {
+          headers: apiHeaders()
+        });
+        if (r.ok) conv = (await r.json()).conversation;
+      } catch (e) {}
+
       if (!conv) return;
-      conversaAtual = conv;
+
+      conversaAtual = {
+        id: conv.id,
+        titulo: conv.title || "Nova conversa",
+        mensagens: (conv.messages || []).map((m) => ({
+          texto: m.content,
+          tipo: m.role === "assistant" ? "assistente" : "usuario"
+        }))
+      };
+
       selecionarSecao("assistente");
       renderizarMensagens();
       renderizarHistorico();
     }
 
-    function excluirConversa(id) {
-      resetarSessaoBackend(id);
-      conversas = conversas.filter((c) => c.id !== id);
-      salvarConversas();
+    async function excluirConversa(id) {
+      try {
+        await fetch(API_BASE + "/conversations/" + encodeURIComponent(id), {
+          method: "DELETE",
+          headers: apiHeaders()
+        });
+      } catch (e) {}
       if (conversaAtual && conversaAtual.id === id) {
         criarConversaAtual();
         renderizarMensagens();
       }
-      renderizarHistorico();
+      await recarregarHistorico();
     }
 
     function novaConversa() {
@@ -2159,16 +2208,6 @@
       return MENSAGENS_ERRO_API[Math.floor(Math.random() * MENSAGENS_ERRO_API.length)];
     }
 
-    // Avisa o backend para esquecer o contexto de uma conversa (best-effort).
-    function resetarSessaoBackend(sessionId) {
-      if (!sessionId) return;
-      fetch("http://localhost:3000/chat/reset", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId })
-      }).catch(() => {});
-    }
-
     async function enviarMensagem() {
       const mensagem = inputMensagem.value.trim();
       if (!mensagem) return;
@@ -2181,9 +2220,9 @@
       const carregando = adicionarDigitando();
 
       try {
-        const resposta = await fetch("http://localhost:3000/chat", {
+        const resposta = await fetch(API_BASE + "/chat", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: apiHeaders(),
           body: JSON.stringify({
             message: mensagem,
             // Cada conversa da barra lateral tem seu próprio contexto no backend.
@@ -2201,6 +2240,10 @@
 
         const textoResposta = dados.retornoChat ?? dados.response ?? dados.resposta ?? dados.message ?? "A API não retornou uma resposta válida.";
         adicionarMensagem(textoResposta, "assistente");
+
+        // O backend já persistiu a conversa (e removeu a mais antiga se passou
+        // de 5). Recarrega a lista para refletir títulos e o limite de 5.
+        await recarregarHistorico();
 
       } catch (erro) {
         console.error(erro);
@@ -2275,30 +2318,34 @@
     /* CONFIGURAÇÕES BTN DANGER */
     const btnLimparDados = document.getElementById("btnLimparDados");
     if (btnLimparDados) {
-      btnLimparDados.addEventListener("click", () => {
+      btnLimparDados.addEventListener("click", async () => {
         if (confirm("Tem certeza que deseja apagar todo o histórico de conversas?")) {
-          conversas.forEach((c) => resetarSessaoBackend(c.id));
-          conversas = [];
-          localStorage.removeItem("playcine-conversas");
+          for (const c of [...conversas]) {
+            try {
+              await fetch(API_BASE + "/conversations/" + encodeURIComponent(c.id), {
+                method: "DELETE",
+                headers: apiHeaders()
+              });
+            } catch (e) {}
+          }
           criarConversaAtual();
           renderizarMensagens();
-          renderizarHistorico();
+          await recarregarHistorico();
           alert("Histórico apagado com sucesso!");
         }
       });
     }
 
     /* INICIALIZAÇÃO */
-    carregarConversas();
-    if (conversas.length > 0) {
-      conversaAtual = conversas[conversas.length - 1];
-    } else {
-      criarConversaAtual();
-    }
-
+    criarConversaAtual();
     selecionarSecao("assistente");
     renderizarMensagens();
-    renderizarHistorico();
+    recarregarHistorico().then(() => {
+      // Abre automaticamente a conversa mais recente, se houver.
+      if (conversas.length > 0 && conversaAtual && (!conversaAtual.mensagens || conversaAtual.mensagens.length === 0)) {
+        abrirConversa(conversas[0].id);
+      }
+    });
   </script>
 </body>
 </html>

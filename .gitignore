@@ -1,6 +1,9 @@
 # Dependências
 node_modules/
 
+# Histórico de conversas persistido em disco (dados locais, não versionar)
+data/
+
 # Variáveis de ambiente / segredos
 .env
 .env.local

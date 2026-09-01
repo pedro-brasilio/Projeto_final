@@ -17,7 +17,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import { SYSTEM_PROMPT } from "./chat/systemPrompt.js";
-import { conversationStore } from "./chat/context.js";
+import { conversationStore, MAX_MENSAGENS } from "./chat/context.js";
+import { historyStore, MAX_CONVERSAS } from "./chat/historyStore.js";
 import { rotearMensagem } from "./chat/router.js";
 import { gerarResposta } from "./services/openai.js";
 import { mensagemErroAleatoria, registrarErroInterno } from "./chat/errors.js";
@@ -52,6 +53,17 @@ function validarEntrada(body) {
   return { ok: true, message, sessionId };
 }
 
+// Identifica o dono das conversas. O projeto não tem login: o frontend gera um
+// id por dispositivo e o envia no header "x-user-id" (ou no corpo, como userId).
+function getUserId(req) {
+  const bruto =
+    (typeof req.headers["x-user-id"] === "string" && req.headers["x-user-id"]) ||
+    (typeof req.body?.userId === "string" && req.body.userId) ||
+    "";
+  const limpo = bruto.trim().slice(0, 100);
+  return limpo || "default";
+}
+
 app.get("/", (req, res) => {
   res.send("BEM VINDO AO SERVIDOR NEON AI");
 });
@@ -63,9 +75,22 @@ app.post("/chat", async (req, res) => {
   }
 
   const { message, sessionId } = entrada;
+  const userId = getUserId(req);
   console.log(`\nRequisição [${sessionId}]:`, message);
 
   try {
+    // 0. Se o contexto em memória desta sessão está vazio (servidor reiniciou ou
+    //    o usuário reabriu uma conversa antiga), recarrega do histórico em disco.
+    if (conversationStore.getHistory(sessionId).length === 0) {
+      const salva = historyStore.obter(userId, sessionId);
+      if (salva && salva.messages.length) {
+        for (const m of salva.messages.slice(-MAX_MENSAGENS)) {
+          if (m.role === "assistant") conversationStore.appendAssistant(sessionId, m.content);
+          else conversationStore.appendUser(sessionId, m.content);
+        }
+      }
+    }
+
     // 1. Histórico atual da sessão + mensagem nova.
     conversationStore.appendUser(sessionId, message);
     const historico = conversationStore.getHistory(sessionId);
@@ -86,9 +111,22 @@ app.post("/chat", async (req, res) => {
 
     const texto = resposta || "Não consegui formular uma resposta agora. Tente reformular a pergunta.";
 
-    // 4. Guardar a resposta no histórico e devolver ao frontend.
+    // 4. Guardar a resposta no contexto em memória.
     conversationStore.appendAssistant(sessionId, texto);
-    res.json({ retornoChat: texto });
+
+    // 5. Persistir a troca no histórico em disco (sobrevive a reinícios).
+    //    A conversa é criada aqui se ainda não existir, respeitando o limite
+    //    de MAX_CONVERSAS (a mais antiga é removida ao criar a 6ª).
+    let removedConversationIds = [];
+    try {
+      const r1 = historyStore.adicionarMensagem(userId, sessionId, "user", message);
+      const r2 = historyStore.adicionarMensagem(userId, sessionId, "assistant", texto);
+      removedConversationIds = [...new Set([...(r1.removedIds || []), ...(r2.removedIds || [])])];
+    } catch (erroHist) {
+      registrarErroInterno("server./chat.historico", erroHist);
+    }
+
+    res.json({ retornoChat: texto, removedConversationIds });
   } catch (erro) {
     registrarErroInterno("server./chat", erro);
     // Remove a última mensagem do usuário para não sujar o contexto com uma
@@ -105,6 +143,47 @@ app.post("/chat/reset", (req, res) => {
       ? req.body.sessionId.trim().slice(0, 100)
       : "default";
   conversationStore.reset(sessionId);
+  res.json({ ok: true });
+});
+
+// ---------------------------------------------------------------------------
+// Histórico de conversas (persistido em disco por chat/historyStore.js).
+// O dono das conversas vem de getUserId(req) -> header "x-user-id".
+// ---------------------------------------------------------------------------
+
+// Lista as conversas do usuário, da mais recente para a mais antiga.
+app.get("/conversations", (req, res) => {
+  const userId = getUserId(req);
+  res.json({ conversations: historyStore.listar(userId), limite: MAX_CONVERSAS });
+});
+
+// Cria uma nova conversa. Aplica o limite de MAX_CONVERSAS: se já houver 5,
+// a mais antiga é removida durante a criação.
+app.post("/conversations", (req, res) => {
+  const userId = getUserId(req);
+  const id = typeof req.body?.id === "string" ? req.body.id : undefined;
+  const title = typeof req.body?.title === "string" ? req.body.title : undefined;
+  const { conversation, removedIds } = historyStore.criar(userId, { id, title });
+  res.status(201).json({ conversation, removedConversationIds: removedIds });
+});
+
+// Retorna uma conversa específica com todas as suas mensagens.
+app.get("/conversations/:id", (req, res) => {
+  const userId = getUserId(req);
+  const conversation = historyStore.obter(userId, req.params.id);
+  if (!conversation) {
+    return res.status(404).json({ erro: "Conversa não encontrada." });
+  }
+  res.json({ conversation });
+});
+
+// Exclui manualmente uma conversa e suas mensagens.
+app.delete("/conversations/:id", (req, res) => {
+  const userId = getUserId(req);
+  const removeu = historyStore.excluir(userId, req.params.id);
+  if (!removeu) {
+    return res.status(404).json({ erro: "Conversa não encontrada." });
+  }
   res.json({ ok: true });
 });
 
