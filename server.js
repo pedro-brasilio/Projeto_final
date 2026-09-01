@@ -4,7 +4,8 @@
 // as peças (contexto -> roteamento -> OpenAI). A lógica de cada parte vive em
 // modules separados:
 //   services/openai.js   -> conversa com a OpenAI Responses API
-//   services/omdb.js     -> dados atuais de filmes e séries (OMDb)
+//   services/omdb.js     -> detalhes de filmes e séries (OMDb)
+//   services/tmdb.js     -> listas de estreias/populares e busca pt-BR (TMDB)
 //   services/igdb.js     -> dados atuais de jogos (IGDB, via OAuth da Twitch)
 //   chat/context.js      -> histórico da conversa
 //   chat/router.js       -> decide quando consultar dados externos

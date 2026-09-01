@@ -81,9 +81,11 @@ Regras:
   "o segundo", "o próximo", "e o jogo?", "e a continuação?". Preencha "consulta"
   com o nome real e completo da obra.
 - Se pelo contexto for um jogo, fonte = "igdb". Se for filme ou série, fonte = "omdb".
-- "modo": use "detalhes" para perguntas sobre uma obra específica. Os modos de
-  lista ("lancamentos_futuros", "em_cartaz_agora", "series_no_ar", "populares")
-  só valem para jogos (fonte = "igdb").
+- "modo": use "detalhes" quando a pergunta for sobre uma obra específica (com
+  "consulta" preenchida). Use um modo de lista quando NÃO houver obra específica:
+  "em_cartaz_agora" (filmes em cartaz), "lancamentos_futuros" (próximas estreias
+  de filmes ou jogos), "series_no_ar" (séries em exibição agora), "populares"
+  (filmes, séries ou jogos populares do momento).
 - Se precisaDadosAtuais = false, use fonte = null, consulta = "", ano = "",
   temporada = null, modo = "generico".
 `;

@@ -12,6 +12,7 @@
 
 import { classificarIntencao } from "../services/openai.js";
 import * as omdb from "../services/omdb.js";
+import * as tmdb from "../services/tmdb.js";
 import * as igdb from "../services/igdb.js";
 import { registrarErroInterno } from "./errors.js";
 
@@ -20,12 +21,31 @@ function bloco(titulo, dados) {
   return `${titulo}\n${JSON.stringify(dados, null, 2)}`;
 }
 
-// OMDb é uma base de consulta por título: não tem listas de "em cartaz",
-// "populares" ou "próximos lançamentos". Sempre que houver uma obra citada,
-// buscamos os detalhes dela; caso contrário, não há dado externo a oferecer.
-async function coletarOmdb({ tipo, consulta, ano, temporada }) {
-  if (!consulta) return null;
+// Filmes e séries: a OMDb resolve os detalhes de um título específico (com nota
+// IMDb, Rotten Tomatoes, Metascore e prêmios). As LISTAS de descoberta (em
+// cartaz, próximas estreias, populares, séries no ar) só existem na TMDB, que
+// também serve de fallback quando a OMDb não acha o título.
+async function coletarFilmeSerie({ tipo, consulta, ano, temporada, modo }) {
+  // 1. Modos de lista, quando não há um título específico em foco.
+  if (!consulta) {
+    if (!tmdb.tmdbConfigurado()) return null;
+    switch (modo) {
+      case "em_cartaz_agora":
+        return bloco("Filmes em cartaz no Brasil agora:", await tmdb.filmesEmCartaz());
+      case "lancamentos_futuros":
+        return bloco("Próximas estreias de filmes:", await tmdb.proximosFilmes());
+      case "series_no_ar":
+        return bloco("Séries em exibição agora:", await tmdb.seriesNoAr());
+      case "populares":
+        return tipo === "serie"
+          ? bloco("Séries populares no momento:", await tmdb.seriesPopulares())
+          : bloco("Filmes populares no momento:", await tmdb.filmesPopulares());
+      default:
+        return null;
+    }
+  }
 
+  // 2. Título específico: temporada de série.
   if (tipo === "serie" && Number.isFinite(temporada) && temporada > 0) {
     const dadosTemporada = await omdb.temporadaDaSerie(consulta, temporada);
     if (dadosTemporada) {
@@ -33,8 +53,14 @@ async function coletarOmdb({ tipo, consulta, ano, temporada }) {
     }
   }
 
+  // 3. Título específico: detalhes pela OMDb, com fallback na TMDB (pt-BR).
   const detalhes = await omdb.buscarComDetalhes(consulta, { tipo, ano });
   if (detalhes) return bloco(`Dados de "${consulta}":`, detalhes);
+
+  if (tmdb.tmdbConfigurado()) {
+    const alternativo = await tmdb.buscarComDetalhes(consulta, { tipo });
+    if (alternativo) return bloco(`Dados de "${consulta}":`, alternativo);
+  }
   return null;
 }
 
@@ -74,9 +100,9 @@ export async function rotearMensagem({ historico, mensagem }) {
 
   try {
     if (intencao.fonte === "omdb") {
-      if (!omdb.omdbConfigurado()) return resultado;
-      resultado.dadosExternos = await coletarOmdb(intencao);
-      resultado.fonteUsada = resultado.dadosExternos ? "omdb" : null;
+      if (!omdb.omdbConfigurado() && !tmdb.tmdbConfigurado()) return resultado;
+      resultado.dadosExternos = await coletarFilmeSerie(intencao);
+      resultado.fonteUsada = resultado.dadosExternos ? "omdb/tmdb" : null;
     } else if (intencao.fonte === "igdb") {
       if (!igdb.igdbConfigurado()) return resultado;
       resultado.dadosExternos = await coletarIgdb(intencao);
