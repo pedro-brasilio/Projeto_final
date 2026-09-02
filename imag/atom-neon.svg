@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" width="100%" height="100%">
+  <defs>
+    <!-- Gradiente Neon Principal (#6050DC -> #7b68ee -> #00D9FF) -->
+    <linearGradient id="neonAtomGradGlobal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6050DC"/>
+      <stop offset="50%" stop-color="#7b68ee"/>
+      <stop offset="100%" stop-color="#00D9FF"/>
+    </linearGradient>
+
+    <!-- Gradiente Radial para o Núcleo -->
+    <radialGradient id="neonAtomCoreGlobal" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00D9FF"/>
+      <stop offset="60%" stop-color="#6050DC"/>
+      <stop offset="100%" stop-color="#3c2da3"/>
+    </radialGradient>
+  </defs>
+
+  <style>
+    .orbit-path {
+      stroke: url(#neonAtomGradGlobal);
+      stroke-width: 4.5;
+      stroke-linecap: round;
+      opacity: 0.95;
+    }
+    .electron-dot {
+      fill: #00D9FF;
+    }
+    .atom-nucleus {
+      fill: url(#neonAtomCoreGlobal);
+    }
+    .nucleus-ring {
+      stroke: #00D9FF;
+      stroke-width: 1.5;
+      opacity: 0.85;
+    }
+  </style>
+
+  <!-- Grupo das Órbitas e Elétrons -->
+  <g class="atom-orbits">
+    <!-- Órbita 1: Vertical -->
+    <ellipse class="orbit-path" cx="50" cy="50" rx="16.5" ry="43.5"/>
+    
+    <!-- Órbita 2: Inclinada +60° -->
+    <ellipse class="orbit-path" cx="50" cy="50" rx="16.5" ry="43.5" transform="rotate(60 50 50)"/>
+    
+    <!-- Órbita 3: Inclinada -60° (120°) -->
+    <ellipse class="orbit-path" cx="50" cy="50" rx="16.5" ry="43.5" transform="rotate(120 50 50)"/>
+    
+    <!-- Elétrons Orbitais -->
+    <circle class="electron-dot" cx="58.5" cy="87.5" r="5.2"/>
+    <circle class="electron-dot" cx="83.5" cy="30" r="5.2"/>
+    <circle class="electron-dot" cx="16" cy="36.5" r="5.2"/>
+  </g>
+
+  <!-- Núcleo Central -->
+  <circle class="atom-nucleus" cx="50" cy="50" r="11"/>
+  <circle class="nucleus-ring" cx="50" cy="50" r="11"/>
+</svg>

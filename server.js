@@ -67,9 +67,8 @@ function getUserId(req) {
   return limpo || "default";
 }
 
-app.get("/", (req, res) => {
-  res.send("BEM VINDO AO SERVIDOR NEON AI");
-});
+app.use(express.static("."));
+
 
 // Integração de promoções de jogos (CheapShark hoje; preparada para outras
 // fontes no futuro). Módulo isolado: rotas, controllers, provider e cache

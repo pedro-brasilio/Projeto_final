@@ -15,6 +15,26 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(96, 80, 220, 0.3) transparent;
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(96, 80, 220, 0.3);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
     }
 
     /* ===================================================== */
@@ -132,13 +152,10 @@
     .app,
     .sidebar,
     .sidebar-top,
-    .sidebar-footer,
     .chat-header,
     .prompt-card,
     .media-card,
     .input-wrapper,
-    .theme-toggle-bar,
-    .theme-toggle-btn,
     .nav-item,
     .config-box,
     .config-btn-option,
@@ -179,7 +196,7 @@
     /* SIDEBAR                                               */
     /* ===================================================== */
     .sidebar {
-      width: 270px;
+      width: 250px;
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
@@ -187,11 +204,12 @@
       border-right: 1px solid var(--border-color);
       transition: width 0.3s ease, var(--theme-transition);
       z-index: 50;
+      position: relative;
     }
 
     .sidebar-top {
-      padding: 20px 18px;
-      border-bottom: 1px solid var(--border-color);
+      padding: 20px 18px 10px 18px;
+      border-bottom: none;
     }
 
     .brand {
@@ -218,18 +236,18 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
+      background: linear-gradient(90deg, #7c68ee 0%, #6050DC 26%, #2dd4bf 70%, #00F0FF 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 1px 4px rgba(96, 80, 220, 0.20));
     }
 
-    .brand-neon {
-      color: var(--brand-neon);
-      text-shadow: var(--neon-text-glow);
-      transition: text-shadow 0.2s ease, color 0.2s ease;
-    }
-
+    .brand-neon,
     .brand-ai {
-      color: var(--brand-cyan);
-      text-shadow: var(--cyan-text-glow);
-      transition: text-shadow 0.2s ease, color 0.2s ease;
+      color: inherit;
+      -webkit-text-fill-color: transparent;
+      text-shadow: none;
     }
 
     .btn-recuar-sidebar {
@@ -248,101 +266,198 @@
       color: var(--text-main);
       cursor: pointer;
       flex-shrink: 0;
-      transition: all 0.2s ease;
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .btn-recuar-sidebar:hover {
       background: var(--card-bg-hover);
       color: var(--text-main);
       border-color: var(--border-glow);
+      box-shadow: 0 3px 12px rgba(96, 80, 220, 0.22);
       transform: translateY(-50%) scale(1.05);
+    }
+
+    /* Transição dos ícones da Sidebar e Menu Toggle para o Átomo Neon */
+    .btn-recuar-sidebar .icon-sidebar-default,
+    .menu-toggle .icon-sidebar-default {
+      display: block;
+      width: 22px;
+      height: 22px;
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+      transition: opacity 0.22s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .btn-recuar-sidebar .icon-atom-neon,
+    .menu-toggle .icon-atom-neon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 25px;
+      height: 25px;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.3) rotate(-60deg);
+      transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+    }
+
+    .btn-recuar-sidebar:hover .icon-sidebar-default,
+    .menu-toggle:hover .icon-sidebar-default {
+      opacity: 0;
+      transform: scale(0.2) rotate(45deg);
+    }
+
+    .btn-recuar-sidebar:hover .icon-atom-neon,
+    .menu-toggle:hover .icon-atom-neon {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      filter: drop-shadow(0 0 3px rgba(96, 80, 220, 0.35));
+    }
+
+    .btn-recuar-sidebar:hover .atom-spin-group,
+    .menu-toggle:hover .atom-spin-group {
+      animation: atomOrbitSpin 6s linear infinite;
+      transform-origin: 50px 50px;
+    }
+
+    .btn-recuar-sidebar:hover .atom-core-pulse,
+    .menu-toggle:hover .atom-core-pulse {
+      animation: atomCorePulse 1.8s ease-in-out infinite alternate;
+      transform-origin: 50px 50px;
+    }
+
+    @keyframes atomOrbitSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes atomCorePulse {
+      0% { transform: scale(0.95); opacity: 0.9; }
+      100% { transform: scale(1.10); opacity: 1; }
     }
 
     /* ESTADO DA SIDEBAR RECOLHIDA (DESKTOP) */
     .sidebar.recolhida {
-      width: 76px;
+      width: 60px;
     }
 
     .sidebar.recolhida .brand-text,
     .sidebar.recolhida .nova-conversa span,
     .sidebar.recolhida .nav-item span,
     .sidebar.recolhida .chevron,
-    .sidebar.recolhida .hist-sublista,
-    .sidebar.recolhida .status span,
-    .sidebar.recolhida .theme-toggle-btn span {
+    .sidebar.recolhida .hist-sublista {
+      display: none !important;
+    }
+
+    /* Todos os itens de navegação ficam visíveis como ícones compactos (exceto Watchlist) */
+    .sidebar.recolhida .nav-item {
+      display: flex !important;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      margin: 0 auto;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .sidebar.recolhida .nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .sidebar.recolhida .nav-item:hover {
+      background: var(--primary-soft-hover);
+      color: var(--primary);
+      transform: scale(1.05);
+    }
+
+    /* Oculta os ícones de Assistente AI e Watchlist quando recuada */
+    .sidebar.recolhida .nav-item[data-secao="assistente"],
+    .sidebar.recolhida .nav-item[data-secao="watchlist"] {
       display: none !important;
     }
 
     .sidebar.recolhida .sidebar-top {
-      padding: 16px 10px;
+      padding: 14px 6px 6px 6px;
+      border-bottom: none;
     }
 
     .sidebar.recolhida .brand {
       flex-direction: column;
-      gap: 10px;
-      margin-bottom: 14px;
+      gap: 8px;
+      margin-bottom: 12px;
       align-items: center;
+      justify-content: center;
     }
 
     .sidebar.recolhida .btn-recuar-sidebar {
+      width: 34px;
+      height: 34px;
       position: relative;
       right: auto;
       top: auto;
       transform: none;
       margin: 0 auto;
+      border-radius: 9px;
     }
 
-    .sidebar.recolhida .btn-recuar-sidebar svg {
+    .sidebar.recolhida .btn-recuar-sidebar:hover {
+      transform: scale(1.05);
+      border-color: var(--border-glow);
+      box-shadow: 0 3px 12px rgba(96, 80, 220, 0.22);
+    }
+
+    .sidebar.recolhida .btn-recuar-sidebar .icon-sidebar-default {
+      width: 20px;
+      height: 20px;
       transform: rotate(180deg);
     }
 
+    .sidebar.recolhida .btn-recuar-sidebar:hover .icon-sidebar-default {
+      opacity: 0;
+      transform: rotate(225deg) scale(0.2);
+    }
+
+    .sidebar.recolhida .btn-recuar-sidebar .icon-atom-neon {
+      width: 23px;
+      height: 23px;
+    }
+
     .sidebar.recolhida .nova-conversa {
-      width: 44px;
-      height: 44px;
+      width: 38px;
+      height: 38px;
       padding: 0;
       margin: 0 auto;
-      border-radius: 12px;
+      border-radius: 10px;
       justify-content: center;
     }
 
-    .sidebar.recolhida .nav-item {
-      justify-content: center;
-      padding: 12px 0;
-      border-radius: 12px;
+    .sidebar.recolhida .nova-conversa svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .sidebar.recolhida .nav {
+      flex: 1;
+      padding: 12px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Botão de Configurações no fundo inferior da sidebar recuada */
+    .sidebar.recolhida .nav-item[data-secao="configuracoes"] {
+      margin-top: auto !important;
+      margin-bottom: 6px;
     }
 
     .sidebar.recolhida .nav-item.ativo::before {
       display: none;
-    }
-
-    .sidebar.recolhida .theme-toggle-bar {
-      flex-direction: column;
-      gap: 12px;
-      padding: 6px;
-      background: transparent;
-      border: none;
-      align-items: center;
-    }
-
-    .sidebar.recolhida .theme-toggle-btn {
-      width: 44px;
-      height: 38px;
-      padding: 0;
-      justify-content: center;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-    }
-
-    .theme-toggle-btn svg {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-      color: currentColor;
-    }
-
-    .sidebar.recolhida .status {
-      justify-content: center;
-      padding: 4px 0;
     }
 
     /* BOTÃO NOVA CONVERSA */
@@ -354,14 +469,15 @@
       gap: 9px;
       padding: 12px;
       border: none;
+      outline: none;
       border-radius: var(--radius-lg);
-      background: var(--primary);
+      background: linear-gradient(90deg, #6050DC 0%, #7262eb 35%, #0ea5e9 75%, #00D9FF 100%);
       color: #ffffff;
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: var(--accent-glow);
-      transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
     }
 
     .nova-conversa svg {
@@ -373,14 +489,14 @@
     }
 
     .nova-conversa:hover {
-      background: var(--primary-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 22px rgba(96, 80, 220, 0.45);
+      transform: translateY(-1px);
+      opacity: 0.96;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.30);
     }
 
     .nova-conversa:active {
       transform: scale(0.98);
-      background: var(--primary-active);
+      opacity: 0.90;
     }
 
     .nova-conversa:disabled {
@@ -457,6 +573,24 @@
       color: currentColor;
     }
 
+    .nav-item img,
+    .nav-avatar-img {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      image-rendering: pixelated;
+      border: 1.5px solid var(--primary-border);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .nav-item:hover .nav-avatar-img,
+    .nav-item.ativo .nav-avatar-img {
+      border-color: var(--brand-cyan);
+      box-shadow: 0 0 8px rgba(0, 217, 255, 0.35);
+    }
+
     .nav-item.ativo svg {
       color: var(--primary);
     }
@@ -484,12 +618,32 @@
       flex-direction: column;
       gap: 2px;
       transition: max-height 0.3s ease;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(96, 80, 220, 0.3) transparent;
     }
 
     .hist-sublista.aberto {
       max-height: 45vh;
       overflow-y: auto;
       margin: 4px 0;
+      padding-right: 2px;
+    }
+
+    .hist-sublista::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .hist-sublista::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .hist-sublista::-webkit-scrollbar-thumb {
+      background: rgba(96, 80, 220, 0.3);
+      border-radius: 10px;
+    }
+
+    .hist-sublista::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
     }
 
     .hist-item {
@@ -573,74 +727,153 @@
       color: #ef4444;
     }
 
-    /* RODAPÉ SIDEBAR & THEME TOGGLE */
-    .sidebar-footer {
-      padding: 16px;
-      border-top: 1px solid var(--border-color);
-      display: flex;
+    /* ===================================================== */
+    /* POPOVER DE HISTÓRICO FLUTUANTE (SIDEBAR RECUADA)      */
+    /* ===================================================== */
+    .hist-popover {
+      position: absolute;
+      left: calc(100% + 8px);
+      top: 130px;
+      width: 250px;
+      max-height: 400px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      box-shadow: 0 16px 40px var(--shadow-color), 0 0 20px rgba(96, 80, 220, 0.15);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      padding: 12px 8px 10px 8px;
+      display: none;
       flex-direction: column;
-      gap: 12px;
+      z-index: 999;
+      opacity: 0;
+      transform: translateX(-10px) scale(0.96);
+      transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
     }
 
-    .theme-toggle-bar {
+    [data-theme="dark"] .hist-popover {
+      background: rgba(22, 27, 44, 0.96);
+      border-color: rgba(96, 80, 220, 0.35);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7), 0 0 25px rgba(96, 80, 220, 0.2);
+    }
+
+    [data-theme="light"] .hist-popover {
+      background: rgba(255, 255, 255, 0.98);
+      border-color: rgba(96, 80, 220, 0.22);
+      box-shadow: 0 16px 40px rgba(96, 80, 220, 0.18), 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .hist-popover.ativo {
+      display: flex;
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      pointer-events: auto;
+    }
+
+
+
+    .hist-popover-header {
+      padding: 4px 10px 8px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: -0.2px;
+      user-select: none;
+    }
+
+    .hist-popover-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      overflow-y: auto;
+      max-height: 320px;
+      padding-right: 2px;
+    }
+
+    .hist-popover-lista::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .hist-popover-lista::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 10px;
+    }
+
+    .hist-popover-item {
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      padding: 5px;
-      background: var(--card-bg);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
+      padding: 9px 12px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+      position: relative;
     }
 
-    .theme-toggle-btn {
+    .hist-popover-item:hover {
+      background: var(--primary-soft-hover);
+      color: var(--primary);
+    }
+
+    .hist-popover-item.ativo {
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .hist-popover-item .popover-item-titulo {
       flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .hist-popover-item .popover-item-excluir {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      padding: 7px 10px;
-      border: none;
-      border-radius: var(--radius-sm);
-      background: transparent;
+      border-radius: 5px;
       color: var(--text-muted);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      opacity: 0;
+      transition: all 0.15s ease;
     }
 
-    .theme-toggle-btn:hover:not(.ativo) {
-      color: var(--text-main);
+    .hist-popover-item:hover .popover-item-excluir {
+      opacity: 1;
+    }
+
+    .hist-popover-item .popover-item-excluir:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    .hist-popover-vazio {
+      padding: 16px 10px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .sidebar.recolhida .nav-item.popover-aberto {
       background: var(--primary-soft);
+      color: var(--primary);
+      box-shadow: 0 0 12px rgba(96, 80, 220, 0.3);
     }
 
-    .theme-toggle-btn.ativo {
-      background: var(--primary);
-      color: #ffffff;
-      box-shadow: 0 2px 10px rgba(96, 80, 220, 0.35);
-    }
 
-    .theme-toggle-btn.ativo svg {
-      color: #ffffff;
-      stroke: #ffffff;
-    }
-
-    .status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 10px #10b981;
-    }
 
     /* ===================================================== */
     /* ÁREA PRINCIPAL                                        */
@@ -662,7 +895,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: none;
       background: var(--header-bg);
     }
 
@@ -685,12 +918,15 @@
       background: var(--card-bg);
       color: var(--text-main);
       cursor: pointer;
-      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .menu-toggle:hover {
       background: var(--card-bg-hover);
       border-color: var(--border-glow);
+      box-shadow: 0 3px 12px rgba(96, 80, 220, 0.22);
     }
 
     .assistant-avatar {
@@ -1542,32 +1778,104 @@
             <h1 class="brand-logo"><span class="brand-neon">Neon</span> <span class="brand-ai">AI</span></h1>
           </div>
           <button class="btn-recuar-sidebar" id="btnRecuarSidebar" title="Recuar / Expandir Sidebar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="19" height="19">
+            <svg class="icon-sidebar-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
               <rect x="3" y="3" width="18" height="18" rx="3.5" ry="3.5"/>
               <line x1="9" y1="3" x2="9" y2="21"/>
               <path d="M4 4h4v16H4z" fill="currentColor" opacity="0.35"/>
             </svg>
+            <svg class="icon-atom-neon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="atomGradSidebar" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#6050DC"/>
+                  <stop offset="50%" stop-color="#8b78f6"/>
+                  <stop offset="100%" stop-color="#00D9FF"/>
+                </linearGradient>
+                <radialGradient id="atomCoreSidebar" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#00D9FF"/>
+                  <stop offset="55%" stop-color="#6050DC"/>
+                  <stop offset="100%" stop-color="#3c2da3"/>
+                </radialGradient>
+                <filter id="atomGlowSidebar" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                  <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              <g class="atom-spin-group">
+                <ellipse cx="50" cy="50" rx="16.5" ry="43.5" stroke="url(#atomGradSidebar)" stroke-width="4.5" stroke-linecap="round"/>
+                <ellipse cx="50" cy="50" rx="16.5" ry="43.5" transform="rotate(60 50 50)" stroke="url(#atomGradSidebar)" stroke-width="4.5" stroke-linecap="round"/>
+                <ellipse cx="50" cy="50" rx="16.5" ry="43.5" transform="rotate(120 50 50)" stroke="url(#atomGradSidebar)" stroke-width="4.5" stroke-linecap="round"/>
+                <circle cx="58.5" cy="87.5" r="5.2" fill="#00D9FF"/>
+                <circle cx="83.5" cy="30" r="5.2" fill="#00D9FF"/>
+                <circle cx="16" cy="36.5" r="5.2" fill="#00D9FF"/>
+              </g>
+              <circle class="atom-core-pulse" cx="50" cy="50" r="11" fill="url(#atomCoreSidebar)"/>
+              <circle cx="50" cy="50" r="11" stroke="#00D9FF" stroke-width="1.5" opacity="0.85"/>
+            </svg>
           </button>
         </div>
 
-        <button class="nova-conversa" id="botaoNova">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
+        <button class="nova-conversa" id="botaoNova" title="Novo chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <line x1="12" y1="7" x2="12" y2="13"/>
+            <line x1="9" y1="10" x2="15" y2="10"/>
           </svg>
-          <span>Nova conversa</span>
+          <span>Novo chat</span>
         </button>
       </div>
 
       <nav class="nav">
-        <button class="nav-item ativo" data-secao="assistente">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-          <span>Assistente AI</span>
+        <button class="nav-item ativo" data-secao="assistente" title="Neon">
+          <img src="imag/avatar.jpg" onerror="this.onerror=null;this.src='avatar.jpg'" alt="Neon" class="nav-avatar-img" />
+          <span>Neon</span>
         </button>
 
-        <button class="nav-item nav-toggle" id="histToggle">
+        <button class="nav-item" data-secao="jogos" title="Catálogo Jogos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 11h4M8 9v4"/>
+            <circle cx="15" cy="12" r="0.75" fill="currentColor"/>
+            <circle cx="17.5" cy="10" r="0.75" fill="currentColor"/>
+            <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.106-.017.158L2 15a4 4 0 0 0 4 4c1.23 0 2.29-.65 2.87-1.63L10 15h4l1.13 2.37A3.992 3.992 0 0 0 18 19a4 4 0 0 0 4-4l-.685-6.252A4 4 0 0 0 17.32 5z"/>
+          </svg>
+          <span>Catálogo Jogos</span>
+        </button>
+
+        <button class="nav-item" data-secao="filmes" title="Catálogo Filmes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="10.5" width="20" height="10.5" rx="2.5" />
+            <line x1="2" y1="14.5" x2="22" y2="14.5" />
+            <line x1="6" y1="14.5" x2="9" y2="10.5" />
+            <line x1="11" y1="14.5" x2="14" y2="10.5" />
+            <line x1="16" y1="14.5" x2="19" y2="10.5" />
+            <g transform="rotate(-16, 2, 9.5)">
+              <rect x="2" y="5.5" width="20" height="4" rx="1.5" />
+              <line x1="6" y1="9.5" x2="9" y2="5.5" />
+              <line x1="11" y1="9.5" x2="14" y2="5.5" />
+              <line x1="16" y1="9.5" x2="19" y2="5.5" />
+            </g>
+          </svg>
+          <span>Catálogo Filmes</span>
+        </button>
+
+        <button class="nav-item" data-secao="promocoes" title="Promoções">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+            <line x1="7" y1="7" x2="7.01" y2="7"/>
+          </svg>
+          <span>Promoções</span>
+        </button>
+
+        <button class="nav-item" data-secao="watchlist" title="Minha Watchlist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span>Minha Watchlist</span>
+        </button>
+
+        <button class="nav-item nav-toggle" id="histToggle" title="Histórico">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
             <polyline points="12 6 12 12 16 14"/>
@@ -1580,46 +1888,7 @@
 
         <div class="hist-sublista" id="historicoLista"></div>
 
-        <button class="nav-item" data-secao="jogos">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 11h4M8 9v4"/>
-            <circle cx="15" cy="12" r="0.75" fill="currentColor"/>
-            <circle cx="17.5" cy="10" r="0.75" fill="currentColor"/>
-            <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.106-.017.158L2 15a4 4 0 0 0 4 4c1.23 0 2.29-.65 2.87-1.63L10 15h4l1.13 2.37A3.992 3.992 0 0 0 18 19a4 4 0 0 0 4-4l-.685-6.252A4 4 0 0 0 17.32 5z"/>
-          </svg>
-          <span>Catálogo Jogos</span>
-        </button>
-
-        <button class="nav-item" data-secao="filmes">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
-            <line x1="7" y1="2" x2="7" y2="22"/>
-            <line x1="17" y1="2" x2="17" y2="22"/>
-            <line x1="2" y1="12" x2="22" y2="12"/>
-            <line x1="2" y1="7" x2="7" y2="7"/>
-            <line x1="2" y1="17" x2="7" y2="17"/>
-            <line x1="17" y1="17" x2="22" y2="17"/>
-            <line x1="17" y1="7" x2="22" y2="7"/>
-          </svg>
-          <span>Catálogo Filmes</span>
-        </button>
-
-        <button class="nav-item" data-secao="promocoes">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-            <line x1="7" y1="7" x2="7.01" y2="7"/>
-          </svg>
-          <span>Promoções</span>
-        </button>
-
-        <button class="nav-item" data-secao="watchlist">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-          </svg>
-          <span>Minha Watchlist</span>
-        </button>
-
-        <button class="nav-item" data-secao="configuracoes">
+        <button class="nav-item" data-secao="configuracoes" title="Configurações">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"/>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -1628,19 +1897,12 @@
         </button>
       </nav>
 
-      <div class="sidebar-footer">
-        <div class="theme-toggle-bar">
-          <button class="theme-toggle-btn ativo" id="btnThemeDark">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="17" height="17"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> <span>Escuro</span>
-          </button>
-          <button class="theme-toggle-btn" id="btnThemeLight">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="17" height="17"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> <span>Claro</span>
-          </button>
+      <!-- POPOVER FLUTUANTE DE HISTÓRICO (SIDEBAR RECUADA) -->
+      <div class="hist-popover" id="histPopover" role="dialog" aria-label="Histórico Recente">
+        <div class="hist-popover-header">
+          <span>Recentes</span>
         </div>
-        <div class="status">
-          <span class="status-dot"></span>
-          <span>Sistema Neon AI Ativo</span>
-        </div>
+        <div class="hist-popover-lista" id="histPopoverLista"></div>
       </div>
     </aside>
 
@@ -1653,15 +1915,27 @@
       <header class="chat-header">
         <div class="header-esquerda">
           <button class="menu-toggle" id="menuToggle" aria-label="Abrir / Recuar Menu">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="19" height="19">
+            <svg class="icon-sidebar-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
               <rect x="3" y="3" width="18" height="18" rx="3.5" ry="3.5"/>
               <line x1="9" y1="3" x2="9" y2="21"/>
               <path d="M4 4h4v16H4z" fill="currentColor" opacity="0.35"/>
             </svg>
+            <svg class="icon-atom-neon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g class="atom-spin-group">
+                <ellipse cx="50" cy="50" rx="16.5" ry="43.5" stroke="url(#atomGradSidebar)" stroke-width="4.5" stroke-linecap="round"/>
+                <ellipse cx="50" cy="50" rx="16.5" ry="43.5" transform="rotate(60 50 50)" stroke="url(#atomGradSidebar)" stroke-width="4.5" stroke-linecap="round"/>
+                <ellipse cx="50" cy="50" rx="16.5" ry="43.5" transform="rotate(120 50 50)" stroke="url(#atomGradSidebar)" stroke-width="4.5" stroke-linecap="round"/>
+                <circle cx="58.5" cy="87.5" r="5.2" fill="#00D9FF"/>
+                <circle cx="83.5" cy="30" r="5.2" fill="#00D9FF"/>
+                <circle cx="16" cy="36.5" r="5.2" fill="#00D9FF"/>
+              </g>
+              <circle class="atom-core-pulse" cx="50" cy="50" r="11" fill="url(#atomCoreSidebar)"/>
+              <circle cx="50" cy="50" r="11" stroke="#00D9FF" stroke-width="1.5" opacity="0.85"/>
+            </svg>
           </button>
 
           <div class="assistant-avatar" id="headerIcone">
-            <img src="avatar.jpg" alt="Neon AI Avatar" class="pixel-avatar-img" />
+            <img src="imag/avatar.jpg" onerror="this.onerror=null;this.src='avatar.jpg'" alt="Neon AI Avatar" class="pixel-avatar-img" />
           </div>
 
           <div class="assistant-text">
@@ -1678,17 +1952,29 @@
           <div class="hero-welcome" id="heroWelcome">
             <div class="hero-mascot-wrap">
               <div class="pixel-speech-bubble-hero">
-                <img src="avatar.jpg" alt="Neon AI Pixel Art" class="pixel-hero-img" />
+                <img src="imag/avatar.jpg" onerror="this.onerror=null;this.src='avatar.jpg'" alt="Neon AI Pixel Art" class="pixel-hero-img" />
               </div>
             </div>
 
 
-            <h3>O que vamos explorar <span class="hero-highlight">hoje?</span></h3>
+            <h3>O que vamos explorar hoje?</h3>
 
             <div class="cards-grid">
               <div class="prompt-card" data-prompt="Me indique 3 filmes incríveis de suspense ou ficção científica para assistir hoje à noite com notas altas.">
                 <div class="prompt-card-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+                    <rect x="2" y="10.5" width="20" height="10.5" rx="2.5" />
+                    <line x1="2" y1="14.5" x2="22" y2="14.5" />
+                    <line x1="6" y1="14.5" x2="9" y2="10.5" />
+                    <line x1="11" y1="14.5" x2="14" y2="10.5" />
+                    <line x1="16" y1="14.5" x2="19" y2="10.5" />
+                    <g transform="rotate(-16, 2, 9.5)">
+                      <rect x="2" y="5.5" width="20" height="4" rx="1.5" />
+                      <line x1="6" y1="9.5" x2="9" y2="5.5" />
+                      <line x1="11" y1="9.5" x2="14" y2="5.5" />
+                      <line x1="16" y1="9.5" x2="19" y2="5.5" />
+                    </g>
+                  </svg>
                 </div>
                 <div class="prompt-card-title">Filmes para Hoje</div>
                 <div class="prompt-card-desc">Sugestões premiadas de suspense e ficção científica para sua noite.</div>
@@ -1987,6 +2273,8 @@
     const botaoNova = document.getElementById("botaoNova");
     const histToggle = document.getElementById("histToggle");
     const historicoLista = document.getElementById("historicoLista");
+    const histPopover = document.getElementById("histPopover");
+    const histPopoverLista = document.getElementById("histPopoverLista");
     
     const viewChat = document.getElementById("viewChat");
     const viewJogos = document.getElementById("viewJogos");
@@ -2016,8 +2304,8 @@
       document.documentElement.setAttribute("data-theme", theme);
       localStorage.setItem("playcine-theme", theme);
 
-      btnThemeDark.classList.toggle("ativo", theme === "dark");
-      btnThemeLight.classList.toggle("ativo", theme === "light");
+      if (btnThemeDark) btnThemeDark.classList.toggle("ativo", theme === "dark");
+      if (btnThemeLight) btnThemeLight.classList.toggle("ativo", theme === "light");
       if (cfgDark && cfgLight) {
         cfgDark.classList.toggle("ativo", theme === "dark");
         cfgLight.classList.toggle("ativo", theme === "light");
@@ -2027,8 +2315,8 @@
     const savedTheme = localStorage.getItem("playcine-theme") || "dark";
     setTheme(savedTheme);
 
-    btnThemeDark.addEventListener("click", () => setTheme("dark"));
-    btnThemeLight.addEventListener("click", () => setTheme("light"));
+    if (btnThemeDark) btnThemeDark.addEventListener("click", () => setTheme("dark"));
+    if (btnThemeLight) btnThemeLight.addEventListener("click", () => setTheme("light"));
     if (cfgDark && cfgLight) {
       cfgDark.addEventListener("click", () => setTheme("dark"));
       cfgLight.addEventListener("click", () => setTheme("light"));
@@ -2038,9 +2326,9 @@
     /* COMPONENTES DE NAVEGAÇÃO                            */
     /* ------------------------------------------------- */
     const SVG_ICONS = {
-      pixelAvatar: `<img src="avatar.jpg" alt="Neon AI Avatar" class="pixel-avatar-img" />`,
+      pixelAvatar: `<img src="imag/avatar.jpg" onerror="this.onerror=null;this.src='avatar.jpg'" alt="Neon AI Avatar" class="pixel-avatar-img" />`,
       gamepad: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M6 11h4M8 9v4"/><circle cx="15" cy="12" r="0.75" fill="currentColor"/><circle cx="17.5" cy="10" r="0.75" fill="currentColor"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.106-.017.158L2 15a4 4 0 0 0 4 4c1.23 0 2.29-.65 2.87-1.63L10 15h4l1.13 2.37A3.992 3.992 0 0 0 18 19a4 4 0 0 0 4-4l-.685-6.252A4 4 0 0 0 17.32 5z"/></svg>`,
-      film: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>`,
+      film: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><rect x="2" y="10.5" width="20" height="10.5" rx="2.5"/><line x1="2" y1="14.5" x2="22" y2="14.5"/><line x1="6" y1="14.5" x2="9" y2="10.5"/><line x1="11" y1="14.5" x2="14" y2="10.5"/><line x1="16" y1="14.5" x2="19" y2="10.5"/><g transform="rotate(-16, 2, 9.5)"><rect x="2" y="5.5" width="20" height="4" rx="1.5"/><line x1="6" y1="9.5" x2="9" y2="5.5"/><line x1="11" y1="9.5" x2="14" y2="5.5"/><line x1="16" y1="9.5" x2="19" y2="5.5"/></g></svg>`,
       bookmark: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`,
       gear: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
       tag: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`
@@ -2530,7 +2818,7 @@
           const d = await r.json();
           conversas = (d.conversations || []).slice(0, MAX_CONVERSAS).map((c) => ({
             id: c.id,
-            titulo: c.title || "Nova conversa",
+            titulo: c.title || "Novo chat",
             atualizadoEm: c.updatedAt || c.createdAt || null,
             qtdMensagens: c.messageCount || 0,
             mensagens: null // carregadas sob demanda ao abrir a conversa
@@ -2556,7 +2844,7 @@
     function criarConversaAtual() {
       conversaAtual = {
         id: "c-" + Date.now(),
-        titulo: "Nova conversa",
+        titulo: "Novo chat",
         mensagens: []
       };
     }
@@ -2570,7 +2858,7 @@
       if (tipo === "assistente") {
         const avatar = document.createElement("div");
         avatar.classList.add("msg-avatar");
-        avatar.innerHTML = `<img src="avatar.jpg" alt="PlayCine AI" class="pixel-avatar-img" />`;
+        avatar.innerHTML = `<img src="imag/avatar.jpg" onerror="this.onerror=null;this.src='avatar.jpg'" alt="Neon AI" class="pixel-avatar-img" />`;
         linha.appendChild(avatar);
       }
 
@@ -2604,7 +2892,7 @@
 
       const avatar = document.createElement("div");
       avatar.classList.add("msg-avatar");
-      avatar.innerHTML = `<img src="avatar.jpg" alt="PlayCine AI" class="pixel-avatar-img" />`;
+      avatar.innerHTML = `<img src="imag/avatar.jpg" onerror="this.onerror=null;this.src='avatar.jpg'" alt="Neon AI" class="pixel-avatar-img" />`;
 
       const bolha = document.createElement("div");
       bolha.classList.add("mensagem", "assistente", "digitando");
@@ -2624,7 +2912,7 @@
       conversaAtual.mensagens.push({ texto, tipo });
 
       // Título local imediato; o backend também deriva o seu ao persistir.
-      if (tipo === "usuario" && conversaAtual.titulo === "Nova conversa") {
+      if (tipo === "usuario" && (conversaAtual.titulo === "Novo chat" || conversaAtual.titulo === "Nova conversa")) {
         conversaAtual.titulo = texto.slice(0, 36) + (texto.length > 36 ? "..." : "");
       }
 
@@ -2647,23 +2935,67 @@
       return new Date(t).toLocaleDateString("pt-BR");
     }
 
+    /* ------------------------------------------------- */
+    /* POPOVER DE HISTÓRICO FLUTUANTE (SIDEBAR RECUADA)  */
+    /* ------------------------------------------------- */
+    function posicionarHistPopover() {
+      if (!histPopover || !histToggle) return;
+      const rectToggle = histToggle.getBoundingClientRect();
+      const rectSidebar = sidebar.getBoundingClientRect();
+      const offsetTop = rectToggle.top - rectSidebar.top;
+      histPopover.style.top = `${Math.max(8, offsetTop - 6)}px`;
+    }
+
+    function abrirHistPopover() {
+      if (!histPopover) return;
+      posicionarHistPopover();
+      histPopover.classList.add("ativo");
+      if (histToggle) histToggle.classList.add("popover-aberto");
+    }
+
+    function fecharHistPopover() {
+      if (!histPopover) return;
+      histPopover.classList.remove("ativo");
+      if (histToggle) histToggle.classList.remove("popover-aberto");
+    }
+
+    function toggleHistPopover() {
+      if (!histPopover) return;
+      if (histPopover.classList.contains("ativo")) {
+        fecharHistPopover();
+      } else {
+        abrirHistPopover();
+      }
+    }
+
     function renderizarHistorico() {
       historicoLista.innerHTML = "";
+      if (histPopoverLista) histPopoverLista.innerHTML = "";
 
       if (conversas.length === 0) {
-        const vazio = document.createElement("div");
-        vazio.className = "hist-vazio";
-        vazio.textContent =
+        const msgVazio =
           historicoStatus === "erro"
             ? "Não foi possível carregar o histórico. O servidor está ligado?"
             : historicoStatus === "carregando"
             ? "Carregando conversas…"
             : "Nenhuma conversa ainda.";
+
+        const vazio = document.createElement("div");
+        vazio.className = "hist-vazio";
+        vazio.textContent = msgVazio;
         historicoLista.appendChild(vazio);
+
+        if (histPopoverLista) {
+          const vazioPop = document.createElement("div");
+          vazioPop.className = "hist-popover-vazio";
+          vazioPop.textContent = msgVazio;
+          histPopoverLista.appendChild(vazioPop);
+        }
         return;
       }
 
       conversas.slice(0, MAX_CONVERSAS).forEach((conv) => {
+        // Item para a sidebar normal aberta
         const item = document.createElement("button");
         item.classList.add("hist-item");
         if (conversaAtual && conversaAtual.id === conv.id) item.classList.add("ativo");
@@ -2689,8 +3021,6 @@
           </span>
         `;
 
-        // textContent (não innerHTML) para o título/subtítulo: evita quebrar o
-        // layout se a 1ª mensagem tiver "<", ">" ou "&".
         item.querySelector(".item-titulo").textContent = conv.titulo;
         if (sub) item.querySelector(".item-sub").textContent = sub;
 
@@ -2701,12 +3031,40 @@
 
         item.addEventListener("click", () => abrirConversa(conv.id));
         historicoLista.appendChild(item);
+
+        // Item para o Popover Flutuante da Sidebar Recuada
+        if (histPopoverLista) {
+          const itemPop = document.createElement("button");
+          itemPop.classList.add("hist-popover-item");
+          if (conversaAtual && conversaAtual.id === conv.id) itemPop.classList.add("ativo");
+
+          itemPop.innerHTML = `
+            <span class="popover-item-titulo"></span>
+            <span class="popover-item-excluir" role="button" aria-label="Excluir conversa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+                <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </span>
+          `;
+
+          itemPop.querySelector(".popover-item-titulo").textContent = conv.titulo;
+
+          itemPop.querySelector(".popover-item-excluir").addEventListener("click", (e) => {
+            e.stopPropagation();
+            excluirConversa(conv.id);
+          });
+
+          itemPop.addEventListener("click", () => {
+            abrirConversa(conv.id);
+            fecharHistPopover();
+          });
+
+          histPopoverLista.appendChild(itemPop);
+        }
       });
 
-      // Na 1ª vez que aparecerem conversas, expande o painel sozinho para o
-      // histórico ficar visível sem precisar clicar. Depois disso respeita a
-      // escolha do usuário.
-      if (!historicoAutoAberto && conversas.length > 0) {
+      // Na 1ª vez que aparecerem conversas, expande o painel sozinho se sidebar aberta
+      if (!historicoAutoAberto && conversas.length > 0 && !sidebar.classList.contains("recolhida")) {
         historicoAutoAberto = true;
         abrirHistorico(true);
       }
@@ -2719,6 +3077,7 @@
     }
 
     async function abrirConversa(id) {
+      fecharHistPopover();
       let conv = null;
       try {
         const r = await fetch(API_BASE + "/conversations/" + encodeURIComponent(id), {
@@ -2731,7 +3090,7 @@
 
       conversaAtual = {
         id: conv.id,
-        titulo: conv.title || "Nova conversa",
+        titulo: conv.title || "Novo chat",
         mensagens: (conv.messages || []).map((m) => ({
           texto: m.content,
           tipo: m.role === "assistant" ? "assistente" : "usuario"
@@ -2861,6 +3220,7 @@
     const btnRecuarSidebar = document.getElementById("btnRecuarSidebar");
 
     function toggleRecuarSidebar() {
+      fecharHistPopover();
       sidebar.classList.toggle("recolhida");
       const recolhida = sidebar.classList.contains("recolhida");
       localStorage.setItem("playcine-sidebar-collapsed", recolhida ? "true" : "false");
@@ -2875,11 +3235,13 @@
     }
 
     function abrirSidebarMobile() {
+      fecharHistPopover();
       sidebar.classList.add("aberta");
       overlay.classList.add("ativo");
     }
 
     function fecharSidebarMobile() {
+      fecharHistPopover();
       sidebar.classList.remove("aberta");
       overlay.classList.remove("ativo");
     }
@@ -2896,8 +3258,40 @@
       }
     });
     overlay.addEventListener("click", fecharSidebarMobile);
-    botaoNova.addEventListener("click", novaConversa);
-    histToggle.addEventListener("click", () => abrirHistorico());
+    botaoNova.addEventListener("click", () => {
+      fecharHistPopover();
+      novaConversa();
+    });
+    histToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (sidebar.classList.contains("recolhida")) {
+        toggleHistPopover();
+      } else {
+        fecharHistPopover();
+        abrirHistorico();
+      }
+    });
+
+    /* Fechar o popover ao clicar fora ou pressionar ESC */
+    document.addEventListener("click", (e) => {
+      if (histPopover && histPopover.classList.contains("ativo")) {
+        if (!histPopover.contains(e.target) && !histToggle.contains(e.target)) {
+          fecharHistPopover();
+        }
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        fecharHistPopover();
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      if (histPopover && histPopover.classList.contains("ativo")) {
+        posicionarHistPopover();
+      }
+    });
 
     /* CONFIGURAÇÕES BTN DANGER */
     const btnLimparDados = document.getElementById("btnLimparDados");

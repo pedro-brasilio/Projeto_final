@@ -53,7 +53,7 @@ function normalizarConteudo(texto) {
 
 function tituloDeMensagem(texto) {
   const limpo = String(texto ?? "").replace(/\s+/g, " ").trim();
-  if (!limpo) return "Nova conversa";
+  if (!limpo) return "Novo chat";
   return limpo.length > 40 ? limpo.slice(0, 40) + "…" : limpo;
 }
 
@@ -177,7 +177,7 @@ class HistoryStore {
     this._db.conversations.push({
       id: convId,
       userId: chave,
-      title: title ? tituloDeMensagem(title) : "Nova conversa",
+      title: title ? tituloDeMensagem(title) : "Novo chat",
       messages: [],
       createdAt: ts,
       updatedAt: ts
@@ -213,7 +213,7 @@ class HistoryStore {
       conv = {
         id: String(id ?? "").trim() || "c-" + Date.now(),
         userId: chave,
-        title: "Nova conversa",
+        title: "Novo chat",
         messages: [],
         createdAt: ts,
         updatedAt: ts
@@ -236,7 +236,7 @@ class HistoryStore {
     if (conv.messages.length > MAX_MENSAGENS_POR_CONVERSA) {
       conv.messages.splice(0, conv.messages.length - MAX_MENSAGENS_POR_CONVERSA);
     }
-    if ((!conv.title || conv.title === "Nova conversa") && role === "user") {
+    if ((!conv.title || conv.title === "Novo chat" || conv.title === "Nova conversa") && role === "user") {
       conv.title = tituloDeMensagem(content);
     }
     conv.updatedAt = agora();
