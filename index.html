@@ -3,12 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Neon AI — Assistente de Games & Cinema</title>
+  <title>Atomix</title>
 
-  <!-- Google Fonts: Plus Jakarta Sans -->
+  <!-- Favicon: Ícone do Átomo -->
+  <link rel="icon" type="image/svg+xml" href="imag/atom-neon.svg" />
+  <link rel="alternate icon" href="imag/atom-neon.svg" type="image/svg+xml" />
+
+  <!-- Google Fonts: Plus Jakarta Sans, Montserrat & Unbounded -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Unbounded:wght@700;800;900&display=swap" rel="stylesheet">
 
   <style>
     * {
@@ -69,16 +73,16 @@
     /* TOKENS DO TEMA ESCURO (DARK MODE)                     */
     /* ===================================================== */
     [data-theme="dark"] {
-      --bg-gradient: radial-gradient(circle at 10% 10%, rgba(96, 80, 220, 0.20), transparent 40%),
-                     radial-gradient(circle at 90% 90%, rgba(0, 217, 255, 0.15), transparent 45%),
-                     radial-gradient(circle at 50% 50%, rgba(96, 80, 220, 0.08), transparent 50%),
-                     #080a14;
-      --app-bg: rgba(14, 18, 32, 0.92);
-      --sidebar-bg: rgba(10, 13, 24, 0.90);
-      --header-bg: rgba(14, 18, 32, 0.75);
-      --card-bg: rgba(22, 29, 50, 0.75);
-      --card-bg-hover: rgba(30, 40, 68, 0.90);
-      --input-bg: rgba(18, 24, 42, 0.85);
+      --bg-gradient: radial-gradient(circle at 10% 10%, rgba(96, 80, 220, 0.22), transparent 40%),
+                     radial-gradient(circle at 90% 90%, rgba(0, 217, 255, 0.18), transparent 45%),
+                     radial-gradient(circle at 50% 50%, rgba(96, 80, 220, 0.10), transparent 50%),
+                     #060810;
+      --app-bg: #0c1022;
+      --sidebar-bg: #090c19;
+      --header-bg: #0c1022;
+      --card-bg: #13192f;
+      --card-bg-hover: #1b2342;
+      --input-bg: #11162b;
 
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
@@ -106,10 +110,10 @@
       --bg-gradient: radial-gradient(circle at 10% 10%, rgba(96, 80, 220, 0.08), transparent 45%),
                      radial-gradient(circle at 90% 90%, rgba(0, 217, 255, 0.06), transparent 45%),
                      radial-gradient(circle at 50% 50%, rgba(96, 80, 220, 0.03), transparent 50%),
-                     #f4f6fa;
-      --app-bg: rgba(255, 255, 255, 0.96);
-      --sidebar-bg: rgba(248, 249, 253, 0.96);
-      --header-bg: rgba(255, 255, 255, 0.92);
+                     #eef1f8;
+      --app-bg: #ffffff;
+      --sidebar-bg: #f8f9fd;
+      --header-bg: #ffffff;
       --card-bg: #ffffff;
       --card-bg-hover: #f7f6fe;
       --input-bg: #ffffff;
@@ -144,7 +148,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 12px;
+      padding: 10px 14px;
       transition: var(--theme-transition);
     }
 
@@ -164,7 +168,7 @@
       transition: var(--theme-transition);
     }
 
-    /* GRID DE FUNDO */
+    /* GRID DE FUNDO SUAVE */
     body::before {
       content: "";
       position: fixed;
@@ -172,24 +176,28 @@
       background-image: 
         linear-gradient(var(--border-color) 1px, transparent 1px),
         linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
-      background-size: 36px 36px;
-      opacity: 0.35;
+      background-size: 40px 40px;
+      opacity: 0.14;
       pointer-events: none;
+      z-index: 0;
     }
 
     /* CONTAINER PRINCIPAL */
     .app {
       width: 100%;
-      max-width: 1320px;
-      height: calc(100vh - 24px);
+      max-width: 1280px;
+      height: calc(100vh - 20px);
+      max-height: 940px;
       display: flex;
       overflow: hidden;
       background: var(--app-bg);
-      border: 1px solid var(--border-color);
+      border: 1px solid rgba(96, 80, 220, 0.28);
       border-radius: var(--radius-2xl);
-      box-shadow: 0 25px 65px var(--shadow-color);
-      backdrop-filter: blur(24px);
+      box-shadow: 
+        0 14px 38px rgba(0, 0, 0, 0.58),
+        0 0 18px rgba(96, 80, 220, 0.14);
       position: relative;
+      z-index: 1;
     }
 
     /* ===================================================== */
@@ -218,30 +226,74 @@
       justify-content: center;
       position: relative;
       margin-bottom: 18px;
+      padding-left: 6px;
+      padding-right: 32px; /* Mantém respiro do botão sem empurrar o título para o canto */
     }
 
     .brand-text {
       text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    /* IDENTIDADE NEON AI */
-    .brand-logo {
-      font-size: 26px;
-      font-weight: 850;
-      letter-spacing: -0.5px;
+    /* IDENTIDADE ATOMIX - GRADIENTE NÍTIDO SEM NEON */
+    .brand-logo,
+    .atomix-logo {
+      font-family: 'Unbounded', 'Montserrat', sans-serif;
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      line-height: 1.1;
+      gap: 0;
+      white-space: nowrap;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
-      background: linear-gradient(90deg, #7c68ee 0%, #6050DC 26%, #2dd4bf 70%, #00F0FF 100%);
+      cursor: default;
+    }
+
+    .brand-a-svg {
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+      overflow: visible;
+      margin-right: -4px;
+    }
+
+    .brand-a-path {
+      fill: url(#atomixGradA);
+    }
+
+    .brand-a-svg-dot {
+      fill: #00D9FF; /* Ponto ciano sólido sem blur/glow */
+      transform-origin: 13.5px 17.5px;
+    }
+
+    .brand-logo-text {
+      background: linear-gradient(90deg, #6558df 0%, #4f7cd3 28%, #3ba2cb 55%, #27d4c7 80%, #0aebf2 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 1px 4px rgba(96, 80, 220, 0.20));
     }
+
+    /* Variante sólida / minimalista (#F8F8FA) caso prefira sem gradiente */
+    .atomix-logo-solid {
+      background: none !important;
+      -webkit-background-clip: initial !important;
+      background-clip: initial !important;
+      -webkit-text-fill-color: initial !important;
+      color: #F8F8FA !important;
+      text-shadow: 0 0 16px rgba(96, 80, 220, 0.45);
+    }
+
+    /* Variante display grande (64px) para hero ou splash screens */
+    .atomix-logo-lg {
+      font-size: 64px;
+    }
+
 
     .brand-neon,
     .brand-ai {
@@ -249,6 +301,8 @@
       -webkit-text-fill-color: transparent;
       text-shadow: none;
     }
+
+
 
     .btn-recuar-sidebar {
       width: 34px;
@@ -392,6 +446,7 @@
       margin-bottom: 12px;
       align-items: center;
       justify-content: center;
+      padding-right: 0;
     }
 
     .sidebar.recolhida .btn-recuar-sidebar {
@@ -929,6 +984,13 @@
       box-shadow: 0 3px 12px rgba(96, 80, 220, 0.22);
     }
 
+    .assistant-profile-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
     .assistant-avatar {
       width: 46px;
       height: 46px;
@@ -967,6 +1029,163 @@
       color: var(--text-muted);
     }
 
+    /* ESTILO MINIMALISTA BIBLIOTECA (TÍTULO + BUSCA PÍLULA + BOTÃO BRANCO) */
+    .header-minimal-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-main, #ffffff);
+      letter-spacing: -0.02em;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .header-acoes-minimal {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-search-pill {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .header-search-pill .search-pill-icon {
+      position: absolute;
+      left: 12px;
+      width: 14px;
+      height: 14px;
+      color: var(--text-muted, #94a3b8);
+      pointer-events: none;
+      transition: color 0.2s ease;
+    }
+
+    .header-search-pill input {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      height: 35px;
+      padding: 0 14px 0 34px;
+      color: var(--text-main, #ffffff);
+      font-size: 13px;
+      width: 180px;
+      outline: none;
+      transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .header-search-pill input::placeholder {
+      color: var(--text-muted, #94a3b8);
+      opacity: 0.8;
+    }
+
+    .header-search-pill input:focus {
+      width: 230px;
+      border-color: rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .header-search-pill:focus-within .search-pill-icon {
+      color: var(--text-main, #ffffff);
+    }
+
+    .dropdown-wrapper {
+      position: relative;
+    }
+
+    .btn-pill-action {
+      height: 35px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #09090b;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .btn-pill-action:hover {
+      background: #f4f4f5;
+      box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn-pill-action:active {
+      transform: scale(0.97);
+    }
+
+    .btn-pill-action .chevron-pill-icon {
+      width: 12px;
+      height: 12px;
+      color: #09090b;
+      stroke-width: 2.5;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-pill-action.ativo .chevron-pill-icon {
+      transform: rotate(180deg);
+    }
+
+    /* DROPDOWN MENU */
+    @keyframes fadeInDropdownMenu {
+      from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .dropdown-menu-minimal {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: var(--card-bg, #13192f);
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.14));
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+      min-width: 175px;
+      padding: 5px;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+      z-index: 200;
+      backdrop-filter: blur(14px);
+      animation: fadeInDropdownMenu 0.15s ease;
+    }
+
+    .dropdown-menu-minimal.aberto {
+      display: flex;
+    }
+
+    .dropdown-item-minimal {
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-main, #ffffff);
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.12s ease;
+    }
+
+    .dropdown-item-minimal:hover {
+      background: var(--card-bg-hover, rgba(255, 255, 255, 0.08));
+    }
+
+    .dropdown-item-minimal.ativo {
+      color: var(--brand-cyan, #00d9ff);
+      font-weight: 600;
+    }
+
+
 
     /* VIEW DO CHAT */
     #viewChat {
@@ -985,6 +1204,8 @@
       flex-direction: column;
       gap: 12px;
       scroll-behavior: smooth;
+      position: relative;
+      z-index: 1;
     }
 
     #mensagens::-webkit-scrollbar {
@@ -1060,64 +1281,103 @@
 
     .cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
       width: 100%;
       max-width: 820px;
     }
 
     .prompt-card {
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       text-align: left;
-      padding: 12px 14px;
-      border-radius: var(--radius-lg);
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       cursor: pointer;
-      box-shadow: 0 4px 14px var(--shadow-color);
-      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: background-color 0.22s ease, border-color 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+      overflow: hidden;
+    }
+
+    [data-theme="light"] .prompt-card {
+      background: rgba(255, 255, 255, 0.72);
+      border-color: rgba(96, 80, 220, 0.12);
+      box-shadow: 0 2px 8px rgba(96, 80, 220, 0.04);
     }
 
     .prompt-card:hover {
-      background: var(--card-bg-hover);
-      border-color: var(--border-glow);
-      transform: translateY(-3px);
-      box-shadow: var(--accent-glow);
+      background: rgba(255, 255, 255, 0.045);
+      border-color: rgba(96, 80, 220, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.35), 0 0 1px rgba(96, 80, 220, 0.25);
+    }
+
+    [data-theme="light"] .prompt-card:hover {
+      background: #ffffff;
+      border-color: rgba(96, 80, 220, 0.35);
+      box-shadow: 0 6px 18px -4px rgba(96, 80, 220, 0.14);
     }
 
     .prompt-card-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--primary-soft);
+      background: rgba(96, 80, 220, 0.08);
+      color: #a594fd;
+      margin-bottom: 10px;
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    [data-theme="light"] .prompt-card-icon {
+      background: rgba(96, 80, 220, 0.08);
       color: var(--primary);
-      margin-bottom: 8px;
-      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .prompt-card:hover .prompt-card-icon {
+      background: rgba(96, 80, 220, 0.18);
+      color: #c4b5fd;
+    }
+
+    [data-theme="light"] .prompt-card:hover .prompt-card-icon {
+      background: rgba(96, 80, 220, 0.15);
+      color: var(--primary);
     }
 
     .prompt-card-icon svg {
-      width: 18px;
-      height: 18px;
-      color: var(--primary);
-      stroke: var(--primary);
+      width: 16px;
+      height: 16px;
+      display: block;
     }
 
     .prompt-card-title {
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 13.5px;
+      font-weight: 600;
       color: var(--text-main);
-      margin-bottom: 2px;
+      margin-bottom: 4px;
+      letter-spacing: -0.15px;
+      line-height: 1.3;
     }
 
     .prompt-card-desc {
-      font-size: 11px;
+      font-size: 11.5px;
       color: var(--text-muted);
-      line-height: 1.35;
+      line-height: 1.42;
+      opacity: 0.78;
+      font-weight: 400;
+      transition: opacity 0.2s ease;
+    }
+
+    .prompt-card:hover .prompt-card-desc {
+      opacity: 0.95;
     }
 
     /* LINHAS DE MENSAGENS */
@@ -1141,8 +1401,8 @@
     }
 
     .msg-avatar {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       flex-shrink: 0;
       border-radius: 50%;
       display: flex;
@@ -1154,58 +1414,54 @@
       position: relative;
       align-self: flex-start;
       margin-top: 2px;
-      transition: box-shadow 0.2s ease;
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
     }
 
+    /* BALÕES DE MENSAGEM PADRONIZADOS (MODERNO & CLEAN) */
     .mensagem {
-      padding: 12px 18px;
+      padding: 13px 18px;
       border-radius: 18px;
-      font-size: 14px;
-      line-height: 1.5;
+      font-size: 14.5px;
+      line-height: 1.62;
+      letter-spacing: -0.01em;
       word-break: break-word;
-      max-width: 85%;
-      box-shadow: 0 4px 15px var(--shadow-color);
+      overflow-wrap: break-word;
+      box-shadow: 0 4px 16px var(--shadow-color);
       white-space: pre-wrap;
+      position: relative;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
     }
 
+    /* Balão do Usuário */
     .mensagem.usuario {
       background: var(--user-bubble);
       color: var(--user-bubble-text);
-      border-bottom-right-radius: 4px;
+      border-top-right-radius: 6px;
       font-weight: 500;
+      max-width: min(80%, 640px);
+      box-shadow: 0 4px 16px rgba(96, 80, 220, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
+    /* Balão do Assistente */
     .mensagem.assistente {
       background: var(--bot-bubble);
       color: var(--bot-bubble-text);
-      border-top-left-radius: 4px;
+      border-top-left-radius: 6px;
       border: 1px solid var(--border-color);
-      box-shadow: 0 4px 20px var(--shadow-color), 0 0 12px rgba(96, 80, 220, 0.12);
-      position: relative;
-    }
-
-    /* TRIÂNGULO DO BALÃO DE MENSAGEM */
-    .mensagem.assistente::before {
-      content: "";
-      position: absolute;
-      top: 13px;
-      left: -7px;
-      width: 12px;
-      height: 12px;
-      background: var(--bot-bubble);
-      border-left: 1px solid var(--border-color);
-      border-bottom: 1px solid var(--border-color);
-      transform: rotate(45deg);
-      border-bottom-left-radius: 2px;
-      z-index: 2;
+      max-width: min(85%, 720px);
+      box-shadow: 0 4px 20px var(--shadow-color), 0 0 14px rgba(96, 80, 220, 0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     /* DIGITANDO ANIMATION */
     .digitando {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
       padding: 14px 20px;
+      width: fit-content;
     }
 
     .digitando span {
@@ -1247,6 +1503,8 @@
       flex-direction: column;
       align-items: center;
       gap: 6px;
+      position: relative;
+      z-index: 10;
     }
 
     .input-wrapper {
@@ -1259,7 +1517,6 @@
       border-radius: var(--radius-xl);
       padding: 4px 6px 4px 16px;
       box-shadow: 0 8px 24px var(--shadow-color);
-      backdrop-filter: blur(16px);
       transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     }
 
@@ -1345,26 +1602,8 @@
       gap: 24px;
     }
 
-    .secao-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border-color);
-    }
 
-    .secao-titulo-wrap h2 {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--text-main);
-    }
 
-    .secao-titulo-wrap p {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
 
     /* GRID DE CARDS DE CATÁLOGO */
     .catalogo-grid {
@@ -1496,88 +1735,450 @@
       border-color: #ef4444;
     }
 
-    /* CONFIGURAÇÕES FORM */
+    /* ===================================================== */
+    /* CONFIGURAÇÃO VIEW                                     */
+    /* ===================================================== */
+    #viewConfiguracoes {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .config-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      gap: 24px;
+      padding-bottom: 40px;
+    }
+
+    .config-main-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+      margin: 0;
+      line-height: 1.2;
+    }
+
     .config-box {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-xl);
-      padding: 24px;
-      max-width: 650px;
+      padding: 28px;
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      box-shadow: 0 4px 16px var(--shadow-color);
+      gap: 30px;
+      box-shadow: 0 4px 20px var(--shadow-color);
+      transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .config-group {
+    .config-section {
       display: flex;
       flex-direction: column;
+      gap: 16px;
+    }
+
+    .config-section-header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .config-section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+
+    .config-section-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    /* TEMA DA INTERFACE */
+    .config-theme-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .config-theme-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-muted);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    [data-theme="light"] .config-theme-card {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .config-theme-card:hover {
+      background: var(--primary-soft);
+      border-color: var(--primary-border);
+      color: var(--text-main);
+      transform: translateY(-1px);
+    }
+
+    .config-theme-card.ativo {
+      background: rgba(96, 80, 220, 0.16);
+      border-color: #6050DC;
+      color: var(--text-main);
+      box-shadow: 0 0 18px rgba(96, 80, 220, 0.15);
+    }
+
+    .config-theme-card-left {
+      display: flex;
+      align-items: center;
       gap: 10px;
     }
 
-    .config-group label {
+    .config-theme-card-left svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      transition: stroke 0.2s ease;
+    }
+
+    .config-theme-card.ativo .config-theme-card-left svg {
+      stroke: #6050DC;
+    }
+
+    .config-check-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      color: #6050DC;
+    }
+
+    .config-check-badge svg {
+      width: 15px;
+      height: 15px;
+      stroke: #6050DC;
+    }
+
+    .config-theme-card.ativo .config-check-badge,
+    .config-personality-card.ativo .config-check-badge {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* PERSONALIDADE DO ASSISTENTE */
+    .config-personality-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .config-personality-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 16px 18px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-muted);
+      cursor: pointer;
+      outline: none;
+      min-height: 96px;
+      height: 100%;
+      text-align: left;
+      gap: 8px;
+      transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    [data-theme="light"] .config-personality-card {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .config-personality-card:hover {
+      background: var(--primary-soft);
+      border-color: var(--primary-border);
+      color: var(--text-main);
+      transform: translateY(-2px);
+    }
+
+    .config-personality-card.ativo {
+      background: rgba(96, 80, 220, 0.16);
+      border-color: #6050DC;
+      color: var(--text-main);
+      box-shadow: 0 0 18px rgba(96, 80, 220, 0.15);
+    }
+
+    .config-personality-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 8px;
+    }
+
+    .config-personality-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.3;
+    }
+
+    .config-personality-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    /* DIVISOR */
+    .config-divider {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      width: 100%;
+      margin: 2px 0;
+    }
+
+    [data-theme="light"] .config-divider {
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    /* GERENCIAMENTO DE DADOS */
+    .config-danger-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .config-danger-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .config-danger-title {
       font-size: 14px;
       font-weight: 700;
       color: var(--text-main);
     }
 
-    .config-options {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
+    .config-danger-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin: 0;
     }
 
-    .config-btn-option {
-      padding: 14px;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border-color);
-      background: transparent;
-      color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.2s ease;
-      display: flex;
+    .config-danger-btn {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-    }
-
-    .config-btn-option:hover {
-      border-color: var(--border-glow);
-      color: var(--text-main);
-      background: var(--primary-soft);
-    }
-
-    .config-btn-option.ativo {
-      background: var(--primary);
-      color: #ffffff;
-      border-color: transparent;
-      box-shadow: var(--accent-glow);
-    }
-
-    .config-btn-option.ativo svg {
-      color: #ffffff;
-      stroke: #ffffff;
-    }
-
-    .danger-btn {
-      padding: 12px 20px;
+      gap: 8px;
+      padding: 10px 18px;
       border-radius: var(--radius-md);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      background: rgba(239, 68, 68, 0.15);
-      color: #ef4444;
+      border: 1px solid #ef4444;
+      background: #ef4444;
+      color: #ffffff;
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      align-self: flex-start;
-      transition: all 0.2s ease;
+      white-space: nowrap;
+      box-shadow: none;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
 
-    .danger-btn:hover {
+    .config-danger-btn svg {
+      stroke: #ffffff;
+      transition: transform 0.2s ease;
+    }
+
+    .config-danger-btn:hover {
+      background: #dc2626;
+      border-color: #dc2626;
+      box-shadow: none;
+      transform: translateY(-1px);
+    }
+
+    .config-danger-btn:active {
+      background: #b91c1c;
+      border-color: #b91c1c;
+      transform: translateY(0);
+    }
+
+    /* MODAL DE CONFIRMAÇÃO */
+    .config-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .config-modal-overlay.ativo {
+      display: flex;
+      animation: fadeInOverlay 0.2s ease;
+    }
+
+    @keyframes fadeInOverlay {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .config-modal {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 440px;
+      padding: 26px;
+      box-shadow: 0 20px 50px var(--shadow-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+      animation: popModal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes popModal {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .config-modal-icon-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+    }
+
+    .config-modal-icon-wrap svg {
+      stroke: #ef4444;
+    }
+
+    .config-modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 0;
+    }
+
+    .config-modal-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin: 0 0 10px 0;
+    }
+
+    .config-modal-actions {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .config-modal-btn {
+      flex: 1;
+      padding: 11px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+      outline: none;
+    }
+
+    .config-modal-btn.btn-cancelar {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+
+    .config-modal-btn.btn-cancelar:hover {
+      background: var(--primary-soft);
+      border-color: var(--primary-border);
+      color: var(--text-main);
+    }
+
+    .config-modal-btn.btn-confirmar-danger {
       background: #ef4444;
+      border: 1px solid #ef4444;
       color: #ffffff;
+      box-shadow: 0 2px 10px rgba(239, 68, 68, 0.25);
+    }
+
+    .config-modal-btn.btn-confirmar-danger:hover {
+      background: #dc2626;
+      border-color: #dc2626;
+      box-shadow: 0 4px 18px rgba(239, 68, 68, 0.4);
+    }
+
+    /* RESPONSIVIDADE CONFIGURAÇÃO */
+    @media (max-width: 768px) {
+      .config-personality-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .config-container {
+        gap: 18px;
+      }
+      .config-box {
+        padding: 18px;
+        gap: 24px;
+      }
+      .config-theme-grid {
+        grid-template-columns: 1fr;
+      }
+      .config-personality-grid {
+        grid-template-columns: 1fr;
+      }
+      .config-danger-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
+      .config-danger-btn {
+        width: 100%;
+      }
+      .config-modal-actions {
+        flex-direction: column-reverse;
+      }
     }
 
     /* OVERLAY MOBILE */
@@ -1759,9 +2360,159 @@
       .menu-toggle { display: flex; }
       .header-tag { display: none; }
     }
+
+    /* ===================================================== */
+    /* AURORA NEON FLUIDA CÓSMICA (PREMIUM BACKGROUND)       */
+    /* ===================================================== */
+    .aurora-neon-bg {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      background: #04060f;
+    }
+
+    [data-theme="light"] .aurora-neon-bg {
+      background: #eef2f9;
+    }
+
+    /* Orbes de luz líquida da Aurora */
+    .aurora-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(75px);
+      will-change: transform, opacity;
+    }
+
+    /* Orbe 1: Roxo Neon Primário Volumoso */
+    .aurora-blob-1 {
+      top: -20%;
+      left: -15%;
+      width: 82vw;
+      height: 82vh;
+      background: radial-gradient(circle, #6050DC 0%, #7c3aed 35%, rgba(96, 80, 220, 0.50) 65%, transparent 78%);
+      opacity: 0.88;
+      animation: auroraMove1 18s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+    }
+
+    /* Orbe 2: Ciano Elétrico Fluorescente */
+    .aurora-blob-2 {
+      bottom: -20%;
+      right: -15%;
+      width: 85vw;
+      height: 85vh;
+      background: radial-gradient(circle, #00D9FF 0%, #06b6d4 30%, rgba(0, 217, 255, 0.50) 60%, transparent 76%);
+      opacity: 0.85;
+      animation: auroraMove2 22s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+    }
+
+    /* Orbe 3: Magenta & Violeta Cyberpunk */
+    .aurora-blob-3 {
+      top: 20%;
+      left: 25%;
+      width: 70vw;
+      height: 70vh;
+      background: radial-gradient(circle, #d946ef 0%, #a855f7 35%, rgba(96, 80, 220, 0.40) 65%, transparent 78%);
+      opacity: 0.78;
+      animation: auroraMove3 16s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+    }
+
+    /* Orbe 4: Pulso Ciano/Safira Lateral */
+    .aurora-blob-4 {
+      bottom: 5%;
+      left: -12%;
+      width: 65vw;
+      height: 65vh;
+      background: radial-gradient(circle, #00F0FF 0%, #3b82f6 35%, rgba(0, 217, 255, 0.35) 60%, transparent 75%);
+      opacity: 0.80;
+      animation: auroraMove4 20s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+    }
+
+    /* Feixe de plasma cósmico da Aurora */
+    .aurora-beam {
+      position: absolute;
+      left: -25%;
+      right: -25%;
+      top: 45%;
+      height: 420px;
+      transform: translateY(-50%) rotate(-14deg);
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(96, 80, 220, 0.50) 20%,
+        rgba(0, 217, 255, 0.60) 50%,
+        rgba(217, 70, 239, 0.45) 80%,
+        transparent 100%
+      );
+      filter: blur(70px);
+      opacity: 0.70;
+      animation: auroraBeamPulse 14s ease-in-out infinite alternate;
+    }
+
+    @keyframes auroraMove1 {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(16vw, 18vh) scale(1.2); }
+      100% { transform: translate(8vw, -10vh) scale(0.95); }
+    }
+
+    @keyframes auroraMove2 {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-18vw, -16vh) scale(1.22); }
+      100% { transform: translate(10vw, 12vh) scale(0.92); }
+    }
+
+    @keyframes auroraMove3 {
+      0% { transform: translate(0, 0) scale(0.95); opacity: 0.65; }
+      50% { transform: translate(14vw, -20vh) scale(1.25); opacity: 0.95; }
+      100% { transform: translate(-12vw, 12vh) scale(1); opacity: 0.75; }
+    }
+
+    @keyframes auroraMove4 {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-18vw, 16vh) scale(1.2); }
+      100% { transform: translate(14vw, 8vh) scale(0.92); }
+    }
+
+    @keyframes auroraBeamPulse {
+      0% { opacity: 0.50; transform: translateY(-50%) rotate(-14deg) scaleY(0.9); }
+      50% { opacity: 0.88; transform: translateY(-50%) rotate(-9deg) scaleY(1.3); }
+      100% { opacity: 0.60; transform: translateY(-50%) rotate(-17deg) scaleY(1); }
+    }
+
+    /* Tema Claro */
+    [data-theme="light"] .aurora-blob {
+      filter: blur(95px);
+      opacity: 0.40;
+    }
+    [data-theme="light"] .aurora-beam {
+      opacity: 0.30;
+    }
+
+    /* Canvas de estrelas e poeira cintilante sobre a aurora */
+    .aurora-stars-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
   </style>
-</head>
 <body>
+
+  <!-- ===================================================== -->
+  <!-- BACKGROUND: AURORA NEON FLUIDA CÓSMICA                -->
+  <!-- ===================================================== -->
+  <div class="aurora-neon-bg" aria-hidden="true">
+    <div class="aurora-blob aurora-blob-1"></div>
+    <div class="aurora-blob aurora-blob-2"></div>
+    <div class="aurora-blob aurora-blob-3"></div>
+    <div class="aurora-blob aurora-blob-4"></div>
+    <div class="aurora-beam"></div>
+    <canvas id="auroraStarsCanvas" class="aurora-stars-canvas"></canvas>
+  </div>
 
   <div class="app">
 
@@ -1775,7 +2526,7 @@
       <div class="sidebar-top">
         <div class="brand">
           <div class="brand-text">
-            <h1 class="brand-logo"><span class="brand-neon">Neon</span> <span class="brand-ai">AI</span></h1>
+            <h1 class="brand-logo atomix-logo" title="Atomix"><svg class="brand-a-svg" viewBox="0 0 27 25" width="27" height="25" aria-hidden="true"><defs><linearGradient id="atomixGradA" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#7663ea"/><stop offset="100%" stop-color="#6558df"/></linearGradient></defs><path class="brand-a-path" d="M 0.5,24.5 L 10.2,1.5 L 16.8,1.5 L 26.5,24.5 L 20.4,24.5 L 13.5,8.2 L 6.6,24.5 Z" fill="url(#atomixGradA)" /><circle class="brand-a-svg-dot" cx="13.5" cy="17.5" r="3.0" fill="#00D9FF" /></svg><span class="brand-logo-text">tomix</span></h1>
           </div>
           <button class="btn-recuar-sidebar" id="btnRecuarSidebar" title="Recuar / Expandir Sidebar">
             <svg class="icon-sidebar-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
@@ -1834,11 +2585,8 @@
         </button>
 
         <button class="nav-item" data-secao="jogos" title="Catálogo Jogos">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 11h4M8 9v4"/>
-            <circle cx="15" cy="12" r="0.75" fill="currentColor"/>
-            <circle cx="17.5" cy="10" r="0.75" fill="currentColor"/>
-            <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.106-.017.158L2 15a4 4 0 0 0 4 4c1.23 0 2.29-.65 2.87-1.63L10 15h4l1.13 2.37A3.992 3.992 0 0 0 18 19a4 4 0 0 0 4-4l-.685-6.252A4 4 0 0 0 17.32 5z"/>
+          <svg viewBox="0 0 512 512" fill="currentColor">
+            <path fill-rule="evenodd" d="M 113 72.967 C 102.826 73.869, 96.445 77.282, 86.990 86.878 C 76.584 97.439, 66.543 113.001, 54.974 136.500 C 28.548 190.173, 9.013 255.766, 1.811 315 C -0.122 330.899, 0.165 366.310, 2.322 377.961 C 4.404 389.214, 9.111 403.746, 12.699 410 C 24.116 429.902, 41.038 440.077, 62.777 440.112 C 81.507 440.143, 99.821 430.301, 121.517 408.545 C 136.418 393.602, 158.045 365.857, 169.535 346.943 L 173.145 341 255.855 341 L 338.565 341 346.663 353.250 C 378.747 401.787, 409.001 430.840, 435.475 438.536 C 443.443 440.852, 459.981 440.125, 468.500 437.084 C 485.437 431.038, 498.083 416.937, 504.901 396.496 C 508.177 386.674, 511 372.265, 511 365.369 C 511 362.966, 511.450 361, 512 361 C 512.622 361, 513 355.314, 513 345.941 C 513 336.156, 512.650 331.098, 512 331.500 C 511.384 331.881, 511 330.194, 511 327.110 C 511 324.356, 510.319 316.792, 509.486 310.301 C 502.097 252.690, 482.104 186.612, 456.511 135.216 C 440.140 102.339, 424.816 82.553, 410.562 75.882 L 403.762 72.700 375.131 72.241 C 343.686 71.738, 338.129 72.367, 327.795 77.604 C 320.824 81.136, 311.808 89.923, 308.336 96.568 L 305.500 101.995 256 101.995 L 206.500 101.995 203.664 96.568 C 200.169 89.879, 191.164 81.130, 184.077 77.539 C 175.043 72.961, 167.850 72.021, 143 72.168 C 130.625 72.242, 117.125 72.601, 113 72.967 M 131.802 103.904 L 114.105 104.500 110.617 107.884 C 93.951 124.052, 69.332 175.344, 53.664 226.542 C 25.506 318.551, 25.016 393.653, 52.491 406.135 C 64.268 411.485, 77.548 406.097, 95.882 388.531 C 111.328 373.731, 128.250 352.119, 144.145 326.890 C 148.645 319.747, 153.716 312.912, 155.414 311.702 L 158.500 309.500 256.177 309.500 C 353.428 309.500, 353.865 309.509, 356.629 311.572 C 358.155 312.712, 363.540 320.137, 368.594 328.072 C 381.924 348.999, 396.932 368.723, 409.468 381.788 C 427.706 400.796, 438.696 407.982, 449.500 407.965 C 453.151 407.960, 457.069 407.243, 459.509 406.135 C 483.527 395.224, 486.522 336.016, 467.001 258 C 451.388 195.600, 424.411 132.934, 403.288 110 L 398.223 104.500 377.861 103.880 C 366.663 103.538, 354.350 103.658, 350.500 104.145 C 339.440 105.546, 336.133 109.035, 330.930 124.800 C 326.661 137.735, 323.111 145.469, 317.924 153.137 C 287.926 197.487, 229.713 199.802, 197.452 157.930 C 190.970 149.517, 186.349 140.445, 182.093 127.776 C 177.650 114.551, 176.690 112.502, 173.175 108.734 C 168.646 103.879, 160.558 102.935, 131.802 103.904 M 221.047 136.088 C 223.081 139.888, 229.033 145.813, 234.055 149.035 C 250.298 159.459, 269.031 157.814, 283.552 144.689 C 286.274 142.230, 289.313 138.818, 290.307 137.109 L 292.113 134 256.021 134 L 219.930 134 221.047 136.088 M 130 180.098 C 123.272 184.041, 122.538 185.979, 122.173 200.750 L 121.845 214 110.238 214 C 100.692 214, 97.910 214.352, 94.566 215.985 C 85.801 220.265, 82.891 230.704, 88.218 238.754 C 92.233 244.820, 95.763 246, 109.901 246 L 122 246 122 258.768 C 122 270.654, 122.168 271.784, 124.439 275.125 C 131.022 284.813, 145.446 284.210, 151.446 273.997 C 153.144 271.106, 153.561 268.389, 153.851 258.327 L 154.201 246.155 166.933 245.827 C 179.017 245.517, 179.845 245.361, 183.243 242.767 C 192.725 235.527, 191.342 220.781, 180.729 215.964 C 177.382 214.444, 174.176 214.039, 165.353 214.022 L 154.206 214 153.853 201.750 C 153.543 190.988, 153.214 189.041, 151.149 185.719 C 146.699 178.560, 137.014 175.986, 130 180.098 M 366.984 179.852 C 354.156 186.669, 355.869 208.501, 369.587 213.029 C 376.593 215.341, 385.013 211.743, 388.536 204.931 C 390.513 201.106, 390.420 190.688, 388.370 186.367 C 384.962 179.185, 374.333 175.947, 366.984 179.852 M 331.271 215.909 C 320.651 220.867, 319.281 235.536, 328.761 242.767 C 331.953 245.201, 333.192 245.500, 340.099 245.500 C 346.371 245.500, 348.381 245.106, 350.615 243.438 C 354.977 240.182, 357.180 236.580, 357.715 231.834 C 358.368 226.045, 356.192 221.011, 351.486 217.422 C 346.527 213.639, 337.568 212.969, 331.271 215.909 M 401.001 215.123 C 388.806 219.986, 387.592 237.468, 399.004 243.882 C 403.685 246.513, 412.650 246.734, 417.688 244.344 C 425.687 240.548, 428.879 229.395, 424.155 221.750 C 420.168 215.300, 408.752 212.033, 401.001 215.123 M 369.500 247.490 C 352.277 253.629, 355.851 281.981, 373.849 281.996 C 379.621 282.001, 384.576 279.518, 387.561 275.125 C 390.984 270.088, 391.082 258.901, 387.747 253.952 C 383.545 247.717, 376.180 245.109, 369.500 247.490" />
           </svg>
           <span>Catálogo Jogos</span>
         </button>
@@ -1888,12 +2636,12 @@
 
         <div class="hist-sublista" id="historicoLista"></div>
 
-        <button class="nav-item" data-secao="configuracoes" title="Configurações">
+        <button class="nav-item" data-secao="configuracoes" title="Configuração">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"/>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
           </svg>
-          <span>Configurações</span>
+          <span>Configuração</span>
         </button>
       </nav>
 
@@ -1934,13 +2682,41 @@
             </svg>
           </button>
 
-          <div class="assistant-avatar" id="headerIcone">
-            <img src="imag/avatar.jpg" onerror="this.onerror=null;this.src='avatar.jpg'" alt="Neon AI Avatar" class="pixel-avatar-img" />
+          <div class="assistant-profile-group" id="headerProfileAssistente">
+            <div class="assistant-avatar" id="headerIcone">
+              <img src="imag/avatar.jpg" onerror="this.onerror=null;this.src='avatar.jpg'" alt="Neon AI Avatar" class="pixel-avatar-img" />
+            </div>
+
+            <div class="assistant-text">
+              <h2 id="headerTitulo">Neon</h2>
+              <p id="headerDesc">Sua especialista em cultura pop</p>
+            </div>
           </div>
 
-          <div class="assistant-text">
-            <h2 id="headerTitulo">Neon</h2>
-            <p id="headerDesc">Sua especialista em cultura pop</p>
+          <h1 class="header-minimal-title" id="headerMinimalTitle" style="display: none;">Catálogo de Games</h1>
+        </div>
+
+        <div class="header-acoes-minimal" id="headerAcoesMinimal" style="display: none;">
+          <div class="header-search-pill">
+            <svg class="search-pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="catalogoPesquisa" placeholder="Pesquisar..." autocomplete="off" />
+          </div>
+
+          <div class="dropdown-wrapper">
+            <button class="btn-pill-action" id="btnPillAction" aria-label="Opções de filtro">
+              <span id="btnPillActionText">Filtrar</span>
+              <svg class="chevron-pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="dropdown-menu-minimal" id="dropdownFiltro">
+              <button class="dropdown-item-minimal ativo" data-filter="todos">Todos</button>
+              <button class="dropdown-item-minimal" data-filter="nota">⭐ Mais bem avaliados</button>
+              <button class="dropdown-item-minimal" data-filter="ano">📅 Mais recentes</button>
+              <button class="dropdown-item-minimal" data-filter="nome">🔤 Ordem alfabética</button>
+            </div>
           </div>
         </div>
       </header>
@@ -1962,7 +2738,7 @@
             <div class="cards-grid">
               <div class="prompt-card" data-prompt="Me indique 3 filmes incríveis de suspense ou ficção científica para assistir hoje à noite com notas altas.">
                 <div class="prompt-card-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="10.5" width="20" height="10.5" rx="2.5" />
                     <line x1="2" y1="14.5" x2="22" y2="14.5" />
                     <line x1="6" y1="14.5" x2="9" y2="10.5" />
@@ -1982,7 +2758,7 @@
 
               <div class="prompt-card" data-prompt="Quais são os melhores jogos de RPG e ação lançados recentemente que valem muito a pena jogar?">
                 <div class="prompt-card-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M6 11h4M8 9v4"/><circle cx="15" cy="12" r="0.75" fill="currentColor"/><circle cx="17.5" cy="10" r="0.75" fill="currentColor"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.106-.017.158L2 15a4 4 0 0 0 4 4c1.23 0 2.29-.65 2.87-1.63L10 15h4l1.13 2.37A3.992 3.992 0 0 0 18 19a4 4 0 0 0 4-4l-.685-6.252A4 4 0 0 0 17.32 5z"/></svg>
+                  <svg viewBox="0 0 512 512" fill="currentColor"><path fill-rule="evenodd" d="M 113 72.967 C 102.826 73.869, 96.445 77.282, 86.990 86.878 C 76.584 97.439, 66.543 113.001, 54.974 136.500 C 28.548 190.173, 9.013 255.766, 1.811 315 C -0.122 330.899, 0.165 366.310, 2.322 377.961 C 4.404 389.214, 9.111 403.746, 12.699 410 C 24.116 429.902, 41.038 440.077, 62.777 440.112 C 81.507 440.143, 99.821 430.301, 121.517 408.545 C 136.418 393.602, 158.045 365.857, 169.535 346.943 L 173.145 341 255.855 341 L 338.565 341 346.663 353.250 C 378.747 401.787, 409.001 430.840, 435.475 438.536 C 443.443 440.852, 459.981 440.125, 468.500 437.084 C 485.437 431.038, 498.083 416.937, 504.901 396.496 C 508.177 386.674, 511 372.265, 511 365.369 C 511 362.966, 511.450 361, 512 361 C 512.622 361, 513 355.314, 513 345.941 C 513 336.156, 512.650 331.098, 512 331.500 C 511.384 331.881, 511 330.194, 511 327.110 C 511 324.356, 510.319 316.792, 509.486 310.301 C 502.097 252.690, 482.104 186.612, 456.511 135.216 C 440.140 102.339, 424.816 82.553, 410.562 75.882 L 403.762 72.700 375.131 72.241 C 343.686 71.738, 338.129 72.367, 327.795 77.604 C 320.824 81.136, 311.808 89.923, 308.336 96.568 L 305.500 101.995 256 101.995 L 206.500 101.995 203.664 96.568 C 200.169 89.879, 191.164 81.130, 184.077 77.539 C 175.043 72.961, 167.850 72.021, 143 72.168 C 130.625 72.242, 117.125 72.601, 113 72.967 M 131.802 103.904 L 114.105 104.500 110.617 107.884 C 93.951 124.052, 69.332 175.344, 53.664 226.542 C 25.506 318.551, 25.016 393.653, 52.491 406.135 C 64.268 411.485, 77.548 406.097, 95.882 388.531 C 111.328 373.731, 128.250 352.119, 144.145 326.890 C 148.645 319.747, 153.716 312.912, 155.414 311.702 L 158.500 309.500 256.177 309.500 C 353.428 309.500, 353.865 309.509, 356.629 311.572 C 358.155 312.712, 363.540 320.137, 368.594 328.072 C 381.924 348.999, 396.932 368.723, 409.468 381.788 C 427.706 400.796, 438.696 407.982, 449.500 407.965 C 453.151 407.960, 457.069 407.243, 459.509 406.135 C 483.527 395.224, 486.522 336.016, 467.001 258 C 451.388 195.600, 424.411 132.934, 403.288 110 L 398.223 104.500 377.861 103.880 C 366.663 103.538, 354.350 103.658, 350.500 104.145 C 339.440 105.546, 336.133 109.035, 330.930 124.800 C 326.661 137.735, 323.111 145.469, 317.924 153.137 C 287.926 197.487, 229.713 199.802, 197.452 157.930 C 190.970 149.517, 186.349 140.445, 182.093 127.776 C 177.650 114.551, 176.690 112.502, 173.175 108.734 C 168.646 103.879, 160.558 102.935, 131.802 103.904 M 221.047 136.088 C 223.081 139.888, 229.033 145.813, 234.055 149.035 C 250.298 159.459, 269.031 157.814, 283.552 144.689 C 286.274 142.230, 289.313 138.818, 290.307 137.109 L 292.113 134 256.021 134 L 219.930 134 221.047 136.088 M 130 180.098 C 123.272 184.041, 122.538 185.979, 122.173 200.750 L 121.845 214 110.238 214 C 100.692 214, 97.910 214.352, 94.566 215.985 C 85.801 220.265, 82.891 230.704, 88.218 238.754 C 92.233 244.820, 95.763 246, 109.901 246 L 122 246 122 258.768 C 122 270.654, 122.168 271.784, 124.439 275.125 C 131.022 284.813, 145.446 284.210, 151.446 273.997 C 153.144 271.106, 153.561 268.389, 153.851 258.327 L 154.201 246.155 166.933 245.827 C 179.017 245.517, 179.845 245.361, 183.243 242.767 C 192.725 235.527, 191.342 220.781, 180.729 215.964 C 177.382 214.444, 174.176 214.039, 165.353 214.022 L 154.206 214 153.853 201.750 C 153.543 190.988, 153.214 189.041, 151.149 185.719 C 146.699 178.560, 137.014 175.986, 130 180.098 M 366.984 179.852 C 354.156 186.669, 355.869 208.501, 369.587 213.029 C 376.593 215.341, 385.013 211.743, 388.536 204.931 C 390.513 201.106, 390.420 190.688, 388.370 186.367 C 384.962 179.185, 374.333 175.947, 366.984 179.852 M 331.271 215.909 C 320.651 220.867, 319.281 235.536, 328.761 242.767 C 331.953 245.201, 333.192 245.500, 340.099 245.500 C 346.371 245.500, 348.381 245.106, 350.615 243.438 C 354.977 240.182, 357.180 236.580, 357.715 231.834 C 358.368 226.045, 356.192 221.011, 351.486 217.422 C 346.527 213.639, 337.568 212.969, 331.271 215.909 M 401.001 215.123 C 388.806 219.986, 387.592 237.468, 399.004 243.882 C 403.685 246.513, 412.650 246.734, 417.688 244.344 C 425.687 240.548, 428.879 229.395, 424.155 221.750 C 420.168 215.300, 408.752 212.033, 401.001 215.123 M 369.500 247.490 C 352.277 253.629, 355.851 281.981, 373.849 281.996 C 379.621 282.001, 384.576 279.518, 387.561 275.125 C 390.984 270.088, 391.082 258.901, 387.747 253.952 C 383.545 247.717, 376.180 245.109, 369.500 247.490" /></svg>
                 </div>
                 <div class="prompt-card-title">Lançamentos de Games</div>
                 <div class="prompt-card-desc">Os títulos de RPG e Ação mais aclamados do momento.</div>
@@ -1990,7 +2766,9 @@
 
               <div class="prompt-card" data-prompt="Me conte 5 curiosidades fascinantes e segredos sobre filmes e séries populares!">
                 <div class="prompt-card-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18h6"/><path d="M10 22h4"/><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/>
+                  </svg>
                 </div>
                 <div class="prompt-card-title">Curiosidades</div>
                 <div class="prompt-card-desc">Fatos surpreendentes e segredos sobre filmes e séries.</div>
@@ -1998,7 +2776,9 @@
 
               <div class="prompt-card" data-prompt="Qual é a ordem cronológica ideal para assistir a todos os filmes de uma franquia famosa?">
                 <div class="prompt-card-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
                 </div>
                 <div class="prompt-card-title">Ordem de Franquias</div>
                 <div class="prompt-card-desc">Guia passo a passo para maratonar sagas sem perder detalhes.</div>
@@ -2006,7 +2786,9 @@
 
               <div class="prompt-card" data-prompt="Quais são os próximos lançamentos de filmes mais aguardados nos cinemas nos próximos meses?">
                 <div class="prompt-card-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M6 4l3 4"/><path d="M11 4l3 4"/><path d="M16 4l3 4"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M6 4l3 4"/><path d="M11 4l3 4"/><path d="M16 4l3 4"/>
+                  </svg>
                 </div>
                 <div class="prompt-card-title">Lançamentos no Cinema</div>
                 <div class="prompt-card-desc">Confira os filmes mais aguardados que estão prestes a chegar às telonas.</div>
@@ -2014,7 +2796,9 @@
 
               <div class="prompt-card" data-secao="promocoes">
                 <div class="prompt-card-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>
+                  </svg>
                 </div>
                 <div class="prompt-card-title">Promoções de Jogos</div>
                 <div class="prompt-card-desc">Ofertas atuais de jogos de PC com comparação de preço entre lojas.</div>
@@ -2040,37 +2824,16 @@
 
       <!-- VIEW 2: CATÁLOGO JOGOS -->
       <section class="view-secao" id="viewJogos" style="display: none;">
-        <div class="secao-header">
-          <div class="secao-titulo-wrap">
-            <h2>Catálogo de Games em Destaque</h2>
-            <p>Descubra os títulos mais populares do mercado gamer e peça indicações personalizadas ao assistente.</p>
-          </div>
-        </div>
-
         <div class="catalogo-grid" id="gridJogos"></div>
       </section>
 
       <!-- VIEW 3: CATÁLOGO FILMES -->
       <section class="view-secao" id="viewFilmes" style="display: none;">
-        <div class="secao-header">
-          <div class="secao-titulo-wrap">
-            <h2>Catálogo de Filmes Aclamados</h2>
-            <p>Confira obras-primas do cinema mundial e encontre a indicação perfeita para o seu dia.</p>
-          </div>
-        </div>
-
         <div class="catalogo-grid" id="gridFilmes"></div>
       </section>
 
       <!-- VIEW: PROMOÇÕES DE JOGOS (dados do backend /api/deals — fonte CheapShark) -->
       <section class="view-secao" id="viewPromocoes" style="display: none;">
-        <div class="secao-header">
-          <div class="secao-titulo-wrap">
-            <h2>Promoções de Jogos</h2>
-            <p>Ofertas atuais de jogos de PC, com comparação de preço entre lojas. Dados via backend Neon.</p>
-          </div>
-        </div>
-
         <div class="promo-toolbar">
           <input type="text" id="promoBusca" placeholder="Buscar jogo pelo nome (ex.: Cyberpunk 2077)..." autocomplete="off" />
           <select id="promoLoja">
@@ -2097,55 +2860,154 @@
 
       <!-- VIEW 4: WATCHLIST -->
       <section class="view-secao" id="viewWatchlist" style="display: none;">
-        <div class="secao-header">
-          <div class="secao-titulo-wrap">
-            <h2>Minha Watchlist</h2>
-            <p>Seus filmes e jogos salvos para assistir ou jogar mais tarde.</p>
-          </div>
-        </div>
-
         <div class="catalogo-grid" id="gridWatchlist"></div>
       </section>
 
-      <!-- VIEW 5: CONFIGURAÇÕES -->
+      <!-- VIEW 5: CONFIGURAÇÃO -->
       <section class="view-secao" id="viewConfiguracoes" style="display: none;">
-        <div class="secao-header">
-          <div class="secao-titulo-wrap">
-            <h2>Configurações do Sistema</h2>
-            <p>Personalize a aparência da interface e as preferências da IA.</p>
-          </div>
-        </div>
+        <div class="config-container">
+          <div class="config-box">
+            <!-- Seção 1: Tema da Interface -->
+            <div class="config-section">
+              <div class="config-section-header">
+                <h2 class="config-section-title">Tema da Interface</h2>
+              </div>
 
-        <div class="config-box">
-          <div class="config-group">
-            <label>Tema da Interface</label>
-            <div class="config-options">
-              <button class="config-btn-option ativo" id="cfgDark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-right: 6px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Modo Escuro
-              </button>
-              <button class="config-btn-option" id="cfgLight">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-right: 6px;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Modo Claro
-              </button>
+              <div class="config-theme-grid">
+                <button type="button" class="config-theme-card ativo" id="cfgDark" data-theme-val="dark">
+                  <div class="config-theme-card-left">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+                    </svg>
+                    <span class="config-theme-name">Modo Escuro</span>
+                  </div>
+                  <div class="config-check-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  </div>
+                </button>
+
+                <button type="button" class="config-theme-card" id="cfgLight" data-theme-val="light">
+                  <div class="config-theme-card-left">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="4"/>
+                      <path d="M12 2v2"/>
+                      <path d="M12 20v2"/>
+                      <path d="m4.93 4.93 1.41 1.41"/>
+                      <path d="m17.66 17.66 1.41 1.41"/>
+                      <path d="M2 12h2"/>
+                      <path d="M20 12h2"/>
+                      <path d="m6.34 17.66-1.41 1.41"/>
+                      <path d="m19.07 4.93-1.41 1.41"/>
+                    </svg>
+                    <span class="config-theme-name">Modo Claro</span>
+                  </div>
+                  <div class="config-check-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  </div>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div class="config-group">
-            <label>Personalidade do Assistente</label>
-            <div class="config-options">
-              <button class="config-btn-option ativo">Geek Entusiasta</button>
-              <button class="config-btn-option">Crítico de Cinema</button>
-              <button class="config-btn-option">Gamer Hardcore</button>
+            <!-- Seção 2: Personalidade do Assistente -->
+            <div class="config-section">
+              <div class="config-section-header">
+                <h2 class="config-section-title">Personalidade do Assistente</h2>
+              </div>
+
+              <div class="config-personality-grid">
+                <!-- Geek Entusiasta -->
+                <button type="button" class="config-personality-card ativo" data-personality="geek">
+                  <div class="config-personality-header">
+                    <span class="config-personality-name">Geek Entusiasta</span>
+                    <div class="config-check-badge">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <p class="config-personality-desc">Respostas descontraídas e cheias de referências.</p>
+                </button>
+
+                <!-- Crítico de Cinema -->
+                <button type="button" class="config-personality-card" data-personality="cinema">
+                  <div class="config-personality-header">
+                    <span class="config-personality-name">Crítico de Cinema</span>
+                    <div class="config-check-badge">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <p class="config-personality-desc">Tom mais analítico e focado em cinema.</p>
+                </button>
+
+                <!-- Gamer Hardcore -->
+                <button type="button" class="config-personality-card" data-personality="gamer">
+                  <div class="config-personality-header">
+                    <span class="config-personality-name">Gamer Hardcore</span>
+                    <div class="config-check-badge">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <p class="config-personality-desc">Foco maior em jogos e detalhes técnicos.</p>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div class="config-group" style="margin-top: 10px;">
-            <label>Gerenciamento de Dados</label>
-            <button class="danger-btn" id="btnLimparDados">Limpar Histórico de Conversas</button>
+            <!-- Divisor -->
+            <div class="config-divider"></div>
+
+            <!-- Seção 3: Gerenciamento de Dados -->
+            <div class="config-section config-section-danger">
+
+              <div class="config-danger-row">
+                <div class="config-danger-info">
+                  <span class="config-danger-title">Histórico de Conversas</span>
+                  <p class="config-danger-desc">Apague todas as conversas armazenadas.</p>
+                </div>
+                <button type="button" class="config-danger-btn" id="btnLimparDados">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                    <path d="M3 6h18"/>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                    <line x1="10" x2="10" y1="11" y2="17"/>
+                    <line x1="14" x2="14" y1="11" y2="17"/>
+                  </svg>
+                  <span>Limpar Histórico de Conversas</span>
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
     </main>
+  </div>
+
+  <!-- Modal de Confirmação: Limpar Histórico -->
+  <div class="config-modal-overlay" id="confirmModalOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitulo">
+    <div class="config-modal">
+      <div class="config-modal-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+          <line x1="12" x2="12" y1="9" y2="13"/>
+          <line x1="12" x2="12.01" y1="17" y2="17"/>
+        </svg>
+      </div>
+      <h3 id="confirmModalTitulo" class="config-modal-title">Limpar histórico?</h3>
+      <p class="config-modal-text">Todas as conversas serão removidas permanentemente. Essa ação não poderá ser desfeita.</p>
+      <div class="config-modal-actions">
+        <button type="button" class="config-modal-btn btn-cancelar" id="btnCancelarLimpar">Cancelar</button>
+        <button type="button" class="config-modal-btn btn-confirmar-danger" id="btnConfirmarLimpar">Limpar histórico</button>
+      </div>
+    </div>
   </div>
 
   <!-- Modal de comparação de lojas de um jogo (Promoções) -->
@@ -2323,11 +3185,32 @@
     }
 
     /* ------------------------------------------------- */
+    /* PERSONALIDADE DO ASSISTENTE                       */
+    /* ------------------------------------------------- */
+    function setPersonality(personalityId) {
+      localStorage.setItem("atomix-personality", personalityId);
+      document.querySelectorAll(".config-personality-card").forEach(card => {
+        card.classList.toggle("ativo", card.dataset.personality === personalityId);
+      });
+    }
+
+    const savedPersonality = localStorage.getItem("atomix-personality") || "geek";
+    setPersonality(savedPersonality);
+
+    document.querySelectorAll(".config-personality-card").forEach(card => {
+      card.addEventListener("click", () => {
+        if (card.dataset.personality) {
+          setPersonality(card.dataset.personality);
+        }
+      });
+    });
+
+    /* ------------------------------------------------- */
     /* COMPONENTES DE NAVEGAÇÃO                            */
     /* ------------------------------------------------- */
     const SVG_ICONS = {
       pixelAvatar: `<img src="imag/avatar.jpg" onerror="this.onerror=null;this.src='avatar.jpg'" alt="Neon AI Avatar" class="pixel-avatar-img" />`,
-      gamepad: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M6 11h4M8 9v4"/><circle cx="15" cy="12" r="0.75" fill="currentColor"/><circle cx="17.5" cy="10" r="0.75" fill="currentColor"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.106-.017.158L2 15a4 4 0 0 0 4 4c1.23 0 2.29-.65 2.87-1.63L10 15h4l1.13 2.37A3.992 3.992 0 0 0 18 19a4 4 0 0 0 4-4l-.685-6.252A4 4 0 0 0 17.32 5z"/></svg>`,
+      gamepad: `<svg viewBox="0 0 512 512" fill="currentColor" width="22" height="22"><path fill-rule="evenodd" d="M 113 72.967 C 102.826 73.869, 96.445 77.282, 86.990 86.878 C 76.584 97.439, 66.543 113.001, 54.974 136.500 C 28.548 190.173, 9.013 255.766, 1.811 315 C -0.122 330.899, 0.165 366.310, 2.322 377.961 C 4.404 389.214, 9.111 403.746, 12.699 410 C 24.116 429.902, 41.038 440.077, 62.777 440.112 C 81.507 440.143, 99.821 430.301, 121.517 408.545 C 136.418 393.602, 158.045 365.857, 169.535 346.943 L 173.145 341 255.855 341 L 338.565 341 346.663 353.250 C 378.747 401.787, 409.001 430.840, 435.475 438.536 C 443.443 440.852, 459.981 440.125, 468.500 437.084 C 485.437 431.038, 498.083 416.937, 504.901 396.496 C 508.177 386.674, 511 372.265, 511 365.369 C 511 362.966, 511.450 361, 512 361 C 512.622 361, 513 355.314, 513 345.941 C 513 336.156, 512.650 331.098, 512 331.500 C 511.384 331.881, 511 330.194, 511 327.110 C 511 324.356, 510.319 316.792, 509.486 310.301 C 502.097 252.690, 482.104 186.612, 456.511 135.216 C 440.140 102.339, 424.816 82.553, 410.562 75.882 L 403.762 72.700 375.131 72.241 C 343.686 71.738, 338.129 72.367, 327.795 77.604 C 320.824 81.136, 311.808 89.923, 308.336 96.568 L 305.500 101.995 256 101.995 L 206.500 101.995 203.664 96.568 C 200.169 89.879, 191.164 81.130, 184.077 77.539 C 175.043 72.961, 167.850 72.021, 143 72.168 C 130.625 72.242, 117.125 72.601, 113 72.967 M 131.802 103.904 L 114.105 104.500 110.617 107.884 C 93.951 124.052, 69.332 175.344, 53.664 226.542 C 25.506 318.551, 25.016 393.653, 52.491 406.135 C 64.268 411.485, 77.548 406.097, 95.882 388.531 C 111.328 373.731, 128.250 352.119, 144.145 326.890 C 148.645 319.747, 153.716 312.912, 155.414 311.702 L 158.500 309.500 256.177 309.500 C 353.428 309.500, 353.865 309.509, 356.629 311.572 C 358.155 312.712, 363.540 320.137, 368.594 328.072 C 381.924 348.999, 396.932 368.723, 409.468 381.788 C 427.706 400.796, 438.696 407.982, 449.500 407.965 C 453.151 407.960, 457.069 407.243, 459.509 406.135 C 483.527 395.224, 486.522 336.016, 467.001 258 C 451.388 195.600, 424.411 132.934, 403.288 110 L 398.223 104.500 377.861 103.880 C 366.663 103.538, 354.350 103.658, 350.500 104.145 C 339.440 105.546, 336.133 109.035, 330.930 124.800 C 326.661 137.735, 323.111 145.469, 317.924 153.137 C 287.926 197.487, 229.713 199.802, 197.452 157.930 C 190.970 149.517, 186.349 140.445, 182.093 127.776 C 177.650 114.551, 176.690 112.502, 173.175 108.734 C 168.646 103.879, 160.558 102.935, 131.802 103.904 M 221.047 136.088 C 223.081 139.888, 229.033 145.813, 234.055 149.035 C 250.298 159.459, 269.031 157.814, 283.552 144.689 C 286.274 142.230, 289.313 138.818, 290.307 137.109 L 292.113 134 256.021 134 L 219.930 134 221.047 136.088 M 130 180.098 C 123.272 184.041, 122.538 185.979, 122.173 200.750 L 121.845 214 110.238 214 C 100.692 214, 97.910 214.352, 94.566 215.985 C 85.801 220.265, 82.891 230.704, 88.218 238.754 C 92.233 244.820, 95.763 246, 109.901 246 L 122 246 122 258.768 C 122 270.654, 122.168 271.784, 124.439 275.125 C 131.022 284.813, 145.446 284.210, 151.446 273.997 C 153.144 271.106, 153.561 268.389, 153.851 258.327 L 154.201 246.155 166.933 245.827 C 179.017 245.517, 179.845 245.361, 183.243 242.767 C 192.725 235.527, 191.342 220.781, 180.729 215.964 C 177.382 214.444, 174.176 214.039, 165.353 214.022 L 154.206 214 153.853 201.750 C 153.543 190.988, 153.214 189.041, 151.149 185.719 C 146.699 178.560, 137.014 175.986, 130 180.098 M 366.984 179.852 C 354.156 186.669, 355.869 208.501, 369.587 213.029 C 376.593 215.341, 385.013 211.743, 388.536 204.931 C 390.513 201.106, 390.420 190.688, 388.370 186.367 C 384.962 179.185, 374.333 175.947, 366.984 179.852 M 331.271 215.909 C 320.651 220.867, 319.281 235.536, 328.761 242.767 C 331.953 245.201, 333.192 245.500, 340.099 245.500 C 346.371 245.500, 348.381 245.106, 350.615 243.438 C 354.977 240.182, 357.180 236.580, 357.715 231.834 C 358.368 226.045, 356.192 221.011, 351.486 217.422 C 346.527 213.639, 337.568 212.969, 331.271 215.909 M 401.001 215.123 C 388.806 219.986, 387.592 237.468, 399.004 243.882 C 403.685 246.513, 412.650 246.734, 417.688 244.344 C 425.687 240.548, 428.879 229.395, 424.155 221.750 C 420.168 215.300, 408.752 212.033, 401.001 215.123 M 369.500 247.490 C 352.277 253.629, 355.851 281.981, 373.849 281.996 C 379.621 282.001, 384.576 279.518, 387.561 275.125 C 390.984 270.088, 391.082 258.901, 387.747 253.952 C 383.545 247.717, 376.180 245.109, 369.500 247.490" /></svg>`,
       film: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><rect x="2" y="10.5" width="20" height="10.5" rx="2.5"/><line x1="2" y1="14.5" x2="22" y2="14.5"/><line x1="6" y1="14.5" x2="9" y2="10.5"/><line x1="11" y1="14.5" x2="14" y2="10.5"/><line x1="16" y1="14.5" x2="19" y2="10.5"/><g transform="rotate(-16, 2, 9.5)"><rect x="2" y="5.5" width="20" height="4" rx="1.5"/><line x1="6" y1="9.5" x2="9" y2="5.5"/><line x1="11" y1="9.5" x2="14" y2="5.5"/><line x1="16" y1="9.5" x2="19" y2="5.5"/></g></svg>`,
       bookmark: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`,
       gear: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
@@ -2336,23 +3219,55 @@
 
     const SECOES = {
       assistente: { titulo: "Neon", desc: "Sua especialista em cultura pop", icone: SVG_ICONS.pixelAvatar, tag: "GAMES & CINEMA" },
-      jogos: { titulo: "Catálogo de Games", desc: "Os títulos mais aclamados do universo gamer", icone: SVG_ICONS.gamepad, tag: "GAMES" },
-      filmes: { titulo: "Catálogo de Cinema", desc: "Grandes produções e indicações de filmes", icone: SVG_ICONS.film, tag: "CINEMA" },
-      promocoes: { titulo: "Promoções de Jogos", desc: "Ofertas atuais de jogos de PC e comparação de preços", icone: SVG_ICONS.tag, tag: "OFERTAS" },
-      watchlist: { titulo: "Minha Watchlist", desc: "Seus filmes e jogos salvos para ver depois", icone: SVG_ICONS.bookmark, tag: "SALVOS" },
-      configuracoes: { titulo: "Configurações", desc: "Ajustes de visual e preferências", icone: SVG_ICONS.gear, tag: "SISTEMA" }
+      jogos: { titulo: "Catálogo de Games", desc: "Os títulos mais populares e bem avaliados", icone: SVG_ICONS.gamepad, tag: "GAMES" },
+      filmes: { titulo: "Catálogo de Filmes", desc: "Grandes produções e cinema mundial", icone: SVG_ICONS.film, tag: "CINEMA" },
+      promocoes: { titulo: "Promoções de Jogos", desc: "Ofertas e descontos em tempo real para PC", icone: SVG_ICONS.tag, tag: "OFERTAS" },
+      watchlist: { titulo: "Minha Watchlist", desc: "Seus filmes e jogos salvos", icone: SVG_ICONS.bookmark, tag: "SALVOS" },
+      configuracoes: { titulo: "Configuração", desc: "Preferências e ajustes do sistema", icone: SVG_ICONS.gear, tag: "SISTEMA" }
     };
+
+    let secaoAtual = "assistente";
+    let filtroAtual = "todos";
 
     function selecionarSecao(id) {
       const meta = SECOES[id] || SECOES.assistente;
+      secaoAtual = id;
 
       document.querySelectorAll(".nav-item[data-secao]").forEach((btn) => {
         btn.classList.toggle("ativo", btn.dataset.secao === id);
       });
 
-      headerIcone.innerHTML = meta.icone;
-      headerTitulo.textContent = meta.titulo;
-      headerDesc.textContent = meta.desc;
+      const headerProfile = document.getElementById("headerProfileAssistente");
+      const headerMinimalTitle = document.getElementById("headerMinimalTitle");
+      const headerAcoesMinimal = document.getElementById("headerAcoesMinimal");
+
+      if (id === "assistente") {
+        if (headerProfile) headerProfile.style.display = "flex";
+        if (headerMinimalTitle) headerMinimalTitle.style.display = "none";
+        if (headerAcoesMinimal) headerAcoesMinimal.style.display = "none";
+        headerIcone.innerHTML = meta.icone;
+        headerTitulo.textContent = meta.titulo;
+        headerDesc.textContent = meta.desc;
+      } else {
+        if (headerProfile) headerProfile.style.display = "none";
+        if (headerMinimalTitle) {
+          headerMinimalTitle.style.display = "block";
+          headerMinimalTitle.textContent = meta.titulo;
+        }
+        if (headerAcoesMinimal) {
+          const mostrarAcoes = (id === "jogos" || id === "filmes" || id === "watchlist");
+          headerAcoesMinimal.style.display = mostrarAcoes ? "flex" : "none";
+          if (mostrarAcoes) {
+            const inputBusca = document.getElementById("catalogoPesquisa");
+            if (inputBusca) inputBusca.value = "";
+            filtroAtual = "todos";
+            const btnTxt = document.getElementById("btnPillActionText");
+            if (btnTxt) btnTxt.textContent = "Filtrar";
+            const items = document.querySelectorAll(".dropdown-item-minimal");
+            items.forEach(i => i.classList.toggle("ativo", i.dataset.filter === "todos"));
+          }
+        }
+      }
 
       viewChat.style.display = id === "assistente" ? "flex" : "none";
       viewJogos.style.display = id === "jogos" ? "flex" : "none";
@@ -2375,6 +3290,88 @@
       if (id === "watchlist") renderizarWatchlist();
 
       fecharSidebarMobile();
+    }
+
+    function aplicarFiltroCatalogo(termo = "", filtro = "todos") {
+      if (secaoAtual !== "jogos" && secaoAtual !== "filmes" && secaoAtual !== "watchlist") return;
+
+      let listaOriginal = [];
+      let elementId = "";
+
+      if (secaoAtual === "jogos") {
+        listaOriginal = [...dadosCatalogo("jogos")];
+        elementId = "gridJogos";
+      } else if (secaoAtual === "filmes") {
+        listaOriginal = [...dadosCatalogo("filmes")];
+        elementId = "gridFilmes";
+      } else if (secaoAtual === "watchlist") {
+        listaOriginal = [...watchlist];
+        elementId = "gridWatchlist";
+      }
+
+      let resultado = listaOriginal;
+
+      if (termo) {
+        resultado = resultado.filter(item => {
+          const tit = (item.titulo || "").toLowerCase();
+          const gen = (item.genero || "").toLowerCase();
+          const desc = (item.descricao || "").toLowerCase();
+          return tit.includes(termo) || gen.includes(termo) || desc.includes(termo);
+        });
+      }
+
+      if (filtro === "nota") {
+        resultado.sort((a, b) => {
+          const nA = parseFloat((a.nota || "").replace(/[^\d.]/g, "")) || 0;
+          const nB = parseFloat((b.nota || "").replace(/[^\d.]/g, "")) || 0;
+          return nB - nA;
+        });
+      } else if (filtro === "ano") {
+        resultado.sort((a, b) => (parseInt(b.ano) || 0) - (parseInt(a.ano) || 0));
+      } else if (filtro === "nome") {
+        resultado.sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
+      }
+
+      renderizarCatalogo(resultado, elementId);
+    }
+
+    const inputPesquisaCatalogo = document.getElementById("catalogoPesquisa");
+    if (inputPesquisaCatalogo) {
+      inputPesquisaCatalogo.addEventListener("input", (e) => {
+        const termo = e.target.value.trim().toLowerCase();
+        aplicarFiltroCatalogo(termo, filtroAtual);
+      });
+    }
+
+    const btnPill = document.getElementById("btnPillAction");
+    const dropdownFiltro = document.getElementById("dropdownFiltro");
+
+    if (btnPill && dropdownFiltro) {
+      btnPill.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const aberto = dropdownFiltro.classList.toggle("aberto");
+        btnPill.classList.toggle("ativo", aberto);
+      });
+
+      document.addEventListener("click", () => {
+        dropdownFiltro.classList.remove("aberto");
+        btnPill.classList.remove("ativo");
+      });
+
+      dropdownFiltro.querySelectorAll(".dropdown-item-minimal").forEach((item) => {
+        item.addEventListener("click", (e) => {
+          e.stopPropagation();
+          dropdownFiltro.querySelectorAll(".dropdown-item-minimal").forEach(i => i.classList.remove("ativo"));
+          item.classList.add("ativo");
+          filtroAtual = item.dataset.filter;
+          const texto = item.textContent.replace(/^[^\w\s]+/, '').trim();
+          document.getElementById("btnPillActionText").textContent = filtroAtual === "todos" ? "Filtrar" : texto;
+          dropdownFiltro.classList.remove("aberto");
+          btnPill.classList.remove("ativo");
+          const termo = inputPesquisaCatalogo ? inputPesquisaCatalogo.value.trim().toLowerCase() : "";
+          aplicarFiltroCatalogo(termo, filtroAtual);
+        });
+      });
     }
 
     document.querySelectorAll(".nav-item[data-secao]").forEach((btn) => {
@@ -3293,11 +4290,47 @@
       }
     });
 
-    /* CONFIGURAÇÕES BTN DANGER */
+    /* CONFIGURAÇÕES: MODAL DE CONFIRMAÇÃO E LIMPEZA DE DADOS */
     const btnLimparDados = document.getElementById("btnLimparDados");
+    const confirmModalOverlay = document.getElementById("confirmModalOverlay");
+    const btnCancelarLimpar = document.getElementById("btnCancelarLimpar");
+    const btnConfirmarLimpar = document.getElementById("btnConfirmarLimpar");
+
+    function abrirModalLimpar() {
+      if (confirmModalOverlay) {
+        confirmModalOverlay.classList.add("ativo");
+      }
+    }
+
+    function fecharModalLimpar() {
+      if (confirmModalOverlay) {
+        confirmModalOverlay.classList.remove("ativo");
+      }
+    }
+
     if (btnLimparDados) {
-      btnLimparDados.addEventListener("click", async () => {
-        if (confirm("Tem certeza que deseja apagar todo o histórico de conversas?")) {
+      btnLimparDados.addEventListener("click", abrirModalLimpar);
+    }
+
+    if (btnCancelarLimpar) {
+      btnCancelarLimpar.addEventListener("click", fecharModalLimpar);
+    }
+
+    if (confirmModalOverlay) {
+      confirmModalOverlay.addEventListener("click", (e) => {
+        if (e.target === confirmModalOverlay) {
+          fecharModalLimpar();
+        }
+      });
+    }
+
+    if (btnConfirmarLimpar) {
+      btnConfirmarLimpar.addEventListener("click", async () => {
+        const txtOriginal = btnConfirmarLimpar.textContent;
+        btnConfirmarLimpar.disabled = true;
+        btnConfirmarLimpar.textContent = "Apagando...";
+
+        try {
           for (const c of [...conversas]) {
             try {
               await fetch(API_BASE + "/conversations/" + encodeURIComponent(c.id), {
@@ -3309,7 +4342,10 @@
           criarConversaAtual();
           renderizarMensagens();
           await recarregarHistorico();
-          alert("Histórico apagado com sucesso!");
+        } finally {
+          btnConfirmarLimpar.disabled = false;
+          btnConfirmarLimpar.textContent = txtOriginal;
+          fecharModalLimpar();
         }
       });
     }
@@ -3324,6 +4360,122 @@
         abrirConversa(conversas[0].id);
       }
     });
+
+    /* ===================================================== */
+    /* AURORA NEON STARS ENGINE (CÉU ESTELAR CINTILANTE)     */
+    /* ===================================================== */
+    (function initAuroraStars() {
+      const canvas = document.getElementById("auroraStarsCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+
+      let width = 0;
+      let height = 0;
+      let dpr = window.devicePixelRatio || 1;
+      let stars = [];
+      let animationFrameId = null;
+
+      const isDark = () => document.documentElement.getAttribute("data-theme") !== "light";
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        dpr = window.devicePixelRatio || 1;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.scale(dpr, dpr);
+        initStars();
+      }
+
+      function initStars() {
+        stars = [];
+        const count = Math.min(Math.floor((width * height) / 9000), 120);
+
+        for (let i = 0; i < count; i++) {
+          stars.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            radius: Math.random() * 2 + 0.8,
+            baseAlpha: Math.random() * 0.55 + 0.45,
+            twinkleSpeed: Math.random() * 0.04 + 0.02,
+            twinkleVal: Math.random() * Math.PI * 2,
+            vx: (Math.random() - 0.5) * 0.18,
+            vy: (Math.random() - 0.5) * 0.18,
+            isCross: i % 14 === 0, // Estrelas brilhantes com pontas de difração
+            colorType: i % 4
+          });
+        }
+      }
+
+      window.addEventListener("resize", resize);
+
+      function getStarColor(type, alpha, dark) {
+        if (dark) {
+          if (type === 0) return `rgba(255, 255, 255, ${alpha})`;
+          if (type === 1) return `rgba(0, 217, 255, ${alpha})`;
+          if (type === 2) return `rgba(192, 132, 252, ${alpha})`;
+          return `rgba(139, 92, 246, ${alpha})`;
+        } else {
+          if (type === 0) return `rgba(96, 80, 220, ${alpha * 0.75})`;
+          if (type === 1) return `rgba(0, 180, 216, ${alpha * 0.75})`;
+          return `rgba(120, 100, 200, ${alpha * 0.75})`;
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+        const dark = isDark();
+
+        for (let i = 0; i < stars.length; i++) {
+          const s = stars[i];
+          s.x += s.vx;
+          s.y += s.vy;
+
+          if (s.x < 0) s.x = width;
+          else if (s.x > width) s.x = 0;
+          if (s.y < 0) s.y = height;
+          else if (s.y > height) s.y = 0;
+
+          s.twinkleVal += s.twinkleSpeed;
+          const currentAlpha = Math.max(0.2, s.baseAlpha + Math.sin(s.twinkleVal) * 0.4);
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+          ctx.shadowBlur = s.radius > 1.6 ? 12 : 6;
+          ctx.shadowColor = s.colorType === 1 ? 'rgba(0, 217, 255, 0.9)' : 'rgba(192, 132, 252, 0.9)';
+          ctx.fillStyle = getStarColor(s.colorType, currentAlpha, dark);
+          ctx.fill();
+
+          // Desenha pequenas pontas de luz para estrelas maiores
+          if (s.isCross) {
+            ctx.strokeStyle = getStarColor(s.colorType, currentAlpha * 0.7, dark);
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(s.x - s.radius * 2.5, s.y);
+            ctx.lineTo(s.x + s.radius * 2.5, s.y);
+            ctx.moveTo(s.x, s.y - s.radius * 2.5);
+            ctx.lineTo(s.x, s.y + s.radius * 2.5);
+            ctx.stroke();
+          }
+
+          ctx.restore();
+        }
+
+        animationFrameId = requestAnimationFrame(draw);
+      }
+
+      resize();
+      draw();
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        } else {
+          animationFrameId = requestAnimationFrame(draw);
+        }
+      });
+    })();
   </script>
 </body>
 </html>
