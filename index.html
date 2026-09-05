@@ -3146,7 +3146,9 @@
     /* ------------------------------------------------- */
     /* BACKEND / HISTÓRICO PERSISTENTE                    */
     /* ------------------------------------------------- */
-    const API_BASE = "http://localhost:3000";
+    // Vazio = mesma origem do site. O proprio server.js serve o index.html,
+    // entao funciona igual no localhost e no Render.
+    const API_BASE = "";
     const MAX_CONVERSAS = 5;
 
     // O projeto não tem login. Geramos um id por dispositivo e o enviamos no
