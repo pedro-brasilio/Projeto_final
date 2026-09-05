@@ -16,7 +16,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import { SYSTEM_PROMPT } from "./chat/systemPrompt.js";
+import { buildSystemPrompt } from "./chat/systemPrompt.js";
 import { conversationStore, MAX_MENSAGENS } from "./chat/context.js";
 import { historyStore, MAX_CONVERSAS } from "./chat/historyStore.js";
 import { rotearMensagem } from "./chat/router.js";
@@ -33,8 +33,9 @@ app.use(cors());
 app.use(express.json({ limit: "32kb" }));
 
 const LIMITE_MENSAGEM = 2000;
+const PERSONALIDADES_VALIDAS = ["geek", "cinema", "gamer"];
 
-// Valida o corpo recebido do frontend. Retorna { ok, message, sessionId } ou { ok:false, erro }.
+// Valida o corpo recebido do frontend. Retorna { ok, message, sessionId, personality } ou { ok:false, erro }.
 function validarEntrada(body) {
   if (!body || typeof body !== "object") {
     return { ok: false, erro: "Corpo da requisição inválido." };
@@ -53,7 +54,9 @@ function validarEntrada(body) {
       ? body.sessionId.trim().slice(0, 100)
       : "default";
 
-  return { ok: true, message, sessionId };
+  const personality = PERSONALIDADES_VALIDAS.includes(body.personality) ? body.personality : "geek";
+
+  return { ok: true, message, sessionId, personality };
 }
 
 // Identifica o dono das conversas. O projeto não tem login: o frontend gera um
@@ -81,7 +84,7 @@ app.post("/chat", async (req, res) => {
     return res.status(400).json({ retornoChat: entrada.erro });
   }
 
-  const { message, sessionId } = entrada;
+  const { message, sessionId, personality } = entrada;
   const userId = getUserId(req);
   console.log(`\nRequisição [${sessionId}]:`, message);
 
@@ -109,9 +112,10 @@ app.post("/chat", async (req, res) => {
     });
     if (fonteUsada) console.log(`  -> dados atuais via ${fonteUsada}`);
 
-    // 3. Gerar a resposta com a OpenAI (System Prompt sempre separado).
+    // 3. Gerar a resposta com a OpenAI (System Prompt sempre separado, já
+    //    ajustado à personalidade escolhida pelo usuário nas configurações).
     const resposta = await gerarResposta({
-      instrucoes: SYSTEM_PROMPT,
+      instrucoes: buildSystemPrompt(personality),
       historico,
       dadosExternos
     });
@@ -233,6 +237,53 @@ app.get("/catalog/games", (req, res) =>
 
 app.get("/catalog/movies", (req, res) =>
   servirCatalogo(res, "movies", tmdb.tmdbConfigurado(), () => tmdb.catalogoFilmes({ limite: 12 }))
+);
+
+// ---------------------------------------------------------------------------
+// Busca livre nos catálogos (pesquisa do usuário). Diferente do catálogo em
+// destaque acima: consulta a IGDB/TMDB por termo, então alcança praticamente
+// qualquer título, não só os 12 fixados. Cache curto (10 min) só para não
+// repetir a mesma consulta em digitação rápida.
+// ---------------------------------------------------------------------------
+
+const BUSCA_TTL_MS = 10 * 60 * 1000;
+const buscaCatalogoCache = new Map(); // "chave:termo" -> { dados, expiraEm }
+
+async function servirBuscaCatalogo(req, res, chave, configurado, buscar) {
+  const termo = typeof req.query.q === "string" ? req.query.q.trim() : "";
+  if (!configurado) {
+    return res.json({ items: [], configurado: false });
+  }
+  if (!termo) {
+    return res.json({ items: [], configurado: true });
+  }
+
+  const chaveCache = `${chave}:${termo.toLowerCase()}`;
+  const cache = buscaCatalogoCache.get(chaveCache);
+  if (cache && Date.now() < cache.expiraEm) {
+    return res.json({ items: cache.dados, configurado: true, cache: true });
+  }
+
+  try {
+    const dados = await buscar(termo);
+    buscaCatalogoCache.set(chaveCache, { dados, expiraEm: Date.now() + BUSCA_TTL_MS });
+    res.json({ items: dados, configurado: true, cache: false });
+  } catch (erro) {
+    registrarErroInterno(`server./catalog/${chave}/search`, erro);
+    res.status(502).json({ items: [], configurado: true, erro: true });
+  }
+}
+
+app.get("/catalog/games/search", (req, res) =>
+  servirBuscaCatalogo(req, res, "games", igdb.igdbConfigurado(), (q) =>
+    igdb.buscarJogosCatalogo(q, { limite: 24 })
+  )
+);
+
+app.get("/catalog/movies/search", (req, res) =>
+  servirBuscaCatalogo(req, res, "movies", tmdb.tmdbConfigurado(), (q) =>
+    tmdb.buscarFilmesCatalogo(q, { limite: 24 })
+  )
 );
 
 app.listen(3000, () => {

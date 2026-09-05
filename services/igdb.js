@@ -393,16 +393,79 @@ function normalizarCard(j) {
   };
 }
 
-// Jogos mais aclamados (muitos votos + nota alta), com capa, para o "Catálogo
-// de Games em Destaque".
-export async function catalogoJogos({ limite = 12 } = {}) {
-  const n = Math.min(Math.max(Number(limite) || 12, 1), 24);
+// A IGDB lista cada versão de plataforma como um id separado (ex.: "Mario &
+// Sonic at the Olympic Winter Games" no Wii e no DS), o que faz o mesmo jogo
+// aparecer repetido no catálogo/busca. Por isso o critério de duplicata é
+// nome + ano (não o id, que nunca colide entre essas versões). Mantém só a
+// 1ª ocorrência (a lista já vem ordenada por relevância/popularidade).
+function dedupeCards(cards) {
+  const vistos = new Set();
+  return cards.filter((c) => {
+    const chave = `${(c.titulo || "").trim().toLowerCase()}|${c.ano || ""}`;
+    if (vistos.has(chave)) return false;
+    vistos.add(chave);
+    return true;
+  });
+}
+
+// Jogos mais aclamados historicamente (usados para completar o catálogo
+// depois dos destaques do mês).
+async function jogosMaisAclamados(limite) {
   const corpo =
     "fields name,first_release_date,genres.name,rating,aggregated_rating,rating_count,cover.image_id,game_type; " +
     `where rating_count > 200 & rating != null & cover != null & game_type = ${TIPOS_REAL_LISTA}; ` +
-    `sort rating_count desc; limit ${n};`;
+    `sort rating_count desc; limit ${limite};`;
   const dados = await igdbQuery("games", corpo);
   return (Array.isArray(dados) ? dados : [])
     .map(normalizarCard)
     .filter((c) => c.cover);
+}
+
+// Jogos em destaque no mês corrente (já lançados ou ainda por lançar),
+// ordenados por "hypes" (quanto o jogo está sendo acompanhado/aguardado na
+// IGDB). Aparecem primeiro no catálogo mesmo sem terem sido lançados ainda.
+async function jogosDestaqueDoMes(limite) {
+  const agora = new Date();
+  const inicioMes = Math.floor(Date.UTC(agora.getUTCFullYear(), agora.getUTCMonth(), 1) / 1000);
+  const fimMes = Math.floor(Date.UTC(agora.getUTCFullYear(), agora.getUTCMonth() + 1, 1) / 1000) - 1;
+  const corpo =
+    "fields name,first_release_date,genres.name,rating,aggregated_rating,rating_count,cover.image_id,game_type,hypes; " +
+    `where first_release_date >= ${inicioMes} & first_release_date <= ${fimMes} & cover != null & game_type = ${TIPOS_REAL_LISTA}; ` +
+    `sort hypes desc; limit ${limite};`;
+  const dados = await igdbQuery("games", corpo);
+  return (Array.isArray(dados) ? dados : [])
+    .map(normalizarCard)
+    .filter((c) => c.cover);
+}
+
+// Catálogo para o "Games em Destaque": primeiro os destaques do mês (mesmo
+// que ainda não tenham sido lançados), depois os mais aclamados historicamente
+// até completar o limite.
+export async function catalogoJogos({ limite = 12 } = {}) {
+  const n = Math.min(Math.max(Number(limite) || 12, 1), 24);
+  const qtdDestaque = Math.min(6, n);
+  const [destaqueMes, aclamados] = await Promise.all([
+    jogosDestaqueDoMes(qtdDestaque),
+    jogosMaisAclamados(n + qtdDestaque) // margem para cobrir eventuais duplicatas com o destaque do mês
+  ]);
+  return dedupeCards([...destaqueMes, ...aclamados]).slice(0, n);
+}
+
+// Busca livre por nome, no mesmo formato de card do catálogo em destaque.
+// Usada pela pesquisa do frontend para alcançar títulos além dos fixados.
+export async function buscarJogosCatalogo(query, { limite = 24 } = {}) {
+  const termo = String(query || "").trim();
+  if (!termo) return [];
+  const n = Math.min(Math.max(Number(limite) || 24, 1), 40);
+  const corpo =
+    `search "${termo.replace(/"/g, '\\"')}"; ` +
+    "fields name,first_release_date,genres.name,rating,aggregated_rating,rating_count,cover.image_id,game_type; " +
+    `limit ${n};`;
+  const dados = await igdbQuery("games", corpo);
+  return dedupeCards(
+    (Array.isArray(dados) ? dados : [])
+      .filter((j) => TIPOS_JOGO_REAL.includes(j.game_type ?? 0))
+      .map(normalizarCard)
+      .filter((c) => c.cover)
+  );
 }

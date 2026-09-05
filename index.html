@@ -1185,6 +1185,12 @@
       font-weight: 600;
     }
 
+    .dropdown-item-icon {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
 
 
     /* VIEW DO CHAT */
@@ -1675,6 +1681,12 @@
       font-weight: 700;
       color: var(--text-main);
       margin-bottom: 6px;
+      line-height: 1.3;
+      min-height: 2.6em;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .media-info {
@@ -2689,7 +2701,7 @@
 
             <div class="assistant-text">
               <h2 id="headerTitulo">Neon</h2>
-              <p id="headerDesc">Sua especialista em cultura pop</p>
+              <p id="headerDesc"></p>
             </div>
           </div>
 
@@ -2713,9 +2725,29 @@
             </button>
             <div class="dropdown-menu-minimal" id="dropdownFiltro">
               <button class="dropdown-item-minimal ativo" data-filter="todos">Todos</button>
-              <button class="dropdown-item-minimal" data-filter="nota">⭐ Mais bem avaliados</button>
-              <button class="dropdown-item-minimal" data-filter="ano">📅 Mais recentes</button>
-              <button class="dropdown-item-minimal" data-filter="nome">🔤 Ordem alfabética</button>
+              <button class="dropdown-item-minimal" data-filter="nota">
+                <svg class="dropdown-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                Mais bem avaliados
+              </button>
+              <button class="dropdown-item-minimal" data-filter="ano">
+                <svg class="dropdown-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Mais recentes
+              </button>
+              <button class="dropdown-item-minimal" data-filter="nome">
+                <svg class="dropdown-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="4" y1="6" x2="20" y2="6"/>
+                  <line x1="4" y1="12" x2="14" y2="12"/>
+                  <line x1="4" y1="18" x2="9" y2="18"/>
+                </svg>
+                Ordem alfabética
+              </button>
             </div>
           </div>
         </div>
@@ -2835,7 +2867,7 @@
       <!-- VIEW: PROMOÇÕES DE JOGOS (dados do backend /api/deals — fonte CheapShark) -->
       <section class="view-secao" id="viewPromocoes" style="display: none;">
         <div class="promo-toolbar">
-          <input type="text" id="promoBusca" placeholder="Buscar jogo pelo nome (ex.: Cyberpunk 2077)..." autocomplete="off" />
+          <input type="text" id="promoBusca" placeholder="Pesquisar jogo..." autocomplete="off" />
           <select id="promoLoja">
             <option value="">Todas as lojas</option>
           </select>
@@ -3041,10 +3073,18 @@
       { id: 'f4', titulo: 'Oppenheimer', ano: '2023', nota: '★ 8.9', genero: 'Biografia / Histórico', cover: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=600&auto=format&fit=crop&q=80' }
     ];
 
-    /* Estado do catálogo carregado do backend. status: idle | carregando | ok | erro */
+    /* Estado do catálogo carregado do backend. status: idle | carregando | ok | erro
+       `busca` guarda o resultado da última pesquisa remota (termo digitado
+       pelo usuário), separado dos itens em destaque em `dados`/`fallback`. */
     const catalogoState = {
-      jogos: { status: "idle", dados: [], rota: "/catalog/games", grid: "gridJogos", fallback: JOGOS_DATA },
-      filmes: { status: "idle", dados: [], rota: "/catalog/movies", grid: "gridFilmes", fallback: FILMES_DATA }
+      jogos: {
+        status: "idle", dados: [], rota: "/catalog/games", buscaRota: "/catalog/games/search",
+        grid: "gridJogos", fallback: JOGOS_DATA, busca: { termo: "", itens: [] }
+      },
+      filmes: {
+        status: "idle", dados: [], rota: "/catalog/movies", buscaRota: "/catalog/movies/search",
+        grid: "gridFilmes", fallback: FILMES_DATA, busca: { termo: "", itens: [] }
+      }
     };
 
     // Dados a exibir agora: os do backend se já vieram, senão o fallback.
@@ -3088,7 +3128,7 @@
         st.status = "erro";
       }
 
-      if (secaoVisivel()) renderizarCatalogo(dadosCatalogo(tipo), st.grid);
+      if (secaoVisivel()) renderizarViewAtual(tipo);
     }
 
     /* ------------------------------------------------- */
@@ -3218,7 +3258,7 @@
     };
 
     const SECOES = {
-      assistente: { titulo: "Neon", desc: "Sua especialista em cultura pop", icone: SVG_ICONS.pixelAvatar, tag: "GAMES & CINEMA" },
+      assistente: { titulo: "Neon", desc: "", icone: SVG_ICONS.pixelAvatar, tag: "GAMES & CINEMA" },
       jogos: { titulo: "Catálogo de Games", desc: "Os títulos mais populares e bem avaliados", icone: SVG_ICONS.gamepad, tag: "GAMES" },
       filmes: { titulo: "Catálogo de Filmes", desc: "Grandes produções e cinema mundial", icone: SVG_ICONS.film, tag: "CINEMA" },
       promocoes: { titulo: "Promoções de Jogos", desc: "Ofertas e descontos em tempo real para PC", icone: SVG_ICONS.tag, tag: "OFERTAS" },
@@ -3292,6 +3332,27 @@
       fecharSidebarMobile();
     }
 
+    // Ordena uma lista de cards (destaque ou resultado de busca) pelo filtro
+    // escolhido no dropdown "Filtrar". "todos" mantém a ordem original.
+    function ordenarCatalogo(lista, filtro) {
+      const resultado = [...lista];
+      if (filtro === "nota") {
+        resultado.sort((a, b) => {
+          const nA = parseFloat((a.nota || "").replace(/[^\d.]/g, "")) || 0;
+          const nB = parseFloat((b.nota || "").replace(/[^\d.]/g, "")) || 0;
+          return nB - nA;
+        });
+      } else if (filtro === "ano") {
+        resultado.sort((a, b) => (parseInt(b.ano) || 0) - (parseInt(a.ano) || 0));
+      } else if (filtro === "nome") {
+        resultado.sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
+      }
+      return resultado;
+    }
+
+    // Filtro local: usado para a watchlist (sempre local) e para os catálogos
+    // de jogos/filmes quando não há termo de pesquisa (mostra o destaque).
+    // Pesquisa com termo em jogos/filmes vai para buscarCatalogoRemoto.
     function aplicarFiltroCatalogo(termo = "", filtro = "todos") {
       if (secaoAtual !== "jogos" && secaoAtual !== "filmes" && secaoAtual !== "watchlist") return;
 
@@ -3320,25 +3381,75 @@
         });
       }
 
-      if (filtro === "nota") {
-        resultado.sort((a, b) => {
-          const nA = parseFloat((a.nota || "").replace(/[^\d.]/g, "")) || 0;
-          const nB = parseFloat((b.nota || "").replace(/[^\d.]/g, "")) || 0;
-          return nB - nA;
-        });
-      } else if (filtro === "ano") {
-        resultado.sort((a, b) => (parseInt(b.ano) || 0) - (parseInt(a.ano) || 0));
-      } else if (filtro === "nome") {
-        resultado.sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
-      }
+      renderizarCatalogo(ordenarCatalogo(resultado, filtro), elementId);
+    }
 
-      renderizarCatalogo(resultado, elementId);
+    // Repinta a view de um catálogo (jogos/filmes) respeitando o que está no
+    // campo de pesquisa: se há uma busca remota correspondente ao termo atual,
+    // mostra ela; senão mostra o destaque (dadosCatalogo). Usado sempre que
+    // algo muda "por baixo" (catálogo terminou de carregar, watchlist mudou)
+    // para não perder o resultado de pesquisa que o usuário já está vendo.
+    function renderizarViewAtual(tipo) {
+      const st = catalogoState[tipo];
+      const termo = inputPesquisaCatalogo ? inputPesquisaCatalogo.value.trim().toLowerCase() : "";
+      if (termo && st.busca.termo.toLowerCase() === termo) {
+        renderizarCatalogo(ordenarCatalogo(st.busca.itens, filtroAtual), st.grid);
+      } else {
+        renderizarCatalogo(ordenarCatalogo(dadosCatalogo(tipo), filtroAtual), st.grid);
+      }
+    }
+
+    // Pesquisa remota: consulta a IGDB/TMDB pelo termo digitado, alcançando
+    // praticamente qualquer título (não só os fixados no destaque).
+    let buscaCatalogoSeq = 0;
+    async function buscarCatalogoRemoto(tipo, termoOriginal) {
+      const st = catalogoState[tipo];
+      const seq = ++buscaCatalogoSeq;
+      if (secaoAtual === tipo) mensagemNoGrid(st.grid, "Buscando…");
+
+      try {
+        const url = API_BASE + st.buscaRota + "?q=" + encodeURIComponent(termoOriginal);
+        const r = await fetch(url, { headers: apiHeaders() });
+        const d = await r.json();
+        if (seq !== buscaCatalogoSeq) return; // uma busca mais nova já foi disparada
+        st.busca = {
+          termo: termoOriginal.toLowerCase(),
+          itens: Array.isArray(d.items) ? d.items.filter((i) => i && i.cover) : []
+        };
+        if (secaoAtual === tipo) {
+          if (st.busca.itens.length) {
+            renderizarCatalogo(ordenarCatalogo(st.busca.itens, filtroAtual), st.grid);
+          } else {
+            mensagemNoGrid(st.grid, "Nenhum título encontrado.");
+          }
+        }
+      } catch (e) {
+        if (seq !== buscaCatalogoSeq) return;
+        if (secaoAtual === tipo) mensagemNoGrid(st.grid, "Não foi possível buscar agora.");
+      }
     }
 
     const inputPesquisaCatalogo = document.getElementById("catalogoPesquisa");
     if (inputPesquisaCatalogo) {
+      let debounceBuscaCatalogo;
       inputPesquisaCatalogo.addEventListener("input", (e) => {
-        const termo = e.target.value.trim().toLowerCase();
+        const termoOriginal = e.target.value.trim();
+        const termo = termoOriginal.toLowerCase();
+        clearTimeout(debounceBuscaCatalogo);
+
+        if (secaoAtual === "jogos" || secaoAtual === "filmes") {
+          if (!termo) {
+            buscaCatalogoSeq++; // invalida qualquer busca remota pendente
+            catalogoState[secaoAtual].busca = { termo: "", itens: [] };
+            aplicarFiltroCatalogo("", filtroAtual);
+            return;
+          }
+          debounceBuscaCatalogo = setTimeout(() => {
+            buscarCatalogoRemoto(secaoAtual, termoOriginal);
+          }, 350);
+          return;
+        }
+
         aplicarFiltroCatalogo(termo, filtroAtual);
       });
     }
@@ -3368,8 +3479,15 @@
           document.getElementById("btnPillActionText").textContent = filtroAtual === "todos" ? "Filtrar" : texto;
           dropdownFiltro.classList.remove("aberto");
           btnPill.classList.remove("ativo");
+
           const termo = inputPesquisaCatalogo ? inputPesquisaCatalogo.value.trim().toLowerCase() : "";
-          aplicarFiltroCatalogo(termo, filtroAtual);
+          const st = catalogoState[secaoAtual];
+          // Já tem resultado de busca remota para esse termo: só reordena, sem refazer a chamada.
+          if (st && termo && st.busca.termo === termo) {
+            renderizarCatalogo(ordenarCatalogo(st.busca.itens, filtroAtual), st.grid);
+          } else {
+            aplicarFiltroCatalogo(termo, filtroAtual);
+          }
         });
       });
     }
@@ -3390,10 +3508,24 @@
       }
       localStorage.setItem('playcine-watchlist', JSON.stringify(watchlist));
       
-      // Atualizar grids visíveis
-      if (viewJogos.style.display !== "none") renderizarCatalogo(dadosCatalogo("jogos"), "gridJogos");
-      if (viewFilmes.style.display !== "none") renderizarCatalogo(dadosCatalogo("filmes"), "gridFilmes");
+      // Atualizar grids visíveis (respeitando uma busca em andamento, se houver)
+      if (viewJogos.style.display !== "none") renderizarViewAtual("jogos");
+      if (viewFilmes.style.display !== "none") renderizarViewAtual("filmes");
       if (viewWatchlist.style.display !== "none") renderizarWatchlist();
+    }
+
+    // Remove duplicatas antes de desenhar (segurança extra: destaque e busca já
+    // vêm sem duplicados do backend, mas isso protege qualquer origem de dados).
+    // Critério: nome + ano, não o id (mesma obra pode ter ids diferentes por
+    // versão/plataforma, ex.: "Mario & Sonic..." no Wii e no DS).
+    function dedupePorTitulo(lista) {
+      const vistos = new Set();
+      return lista.filter((item) => {
+        const chave = `${(item.titulo || "").trim().toLowerCase()}|${item.ano || ""}`;
+        if (vistos.has(chave)) return false;
+        vistos.add(chave);
+        return true;
+      });
     }
 
     function renderizarCatalogo(dados, elementId) {
@@ -3401,7 +3533,7 @@
       if (!grid) return;
       grid.innerHTML = "";
 
-      dados.forEach(item => {
+      dedupePorTitulo(dados).forEach(item => {
         const isSaved = watchlist.some(w => w.id === item.id);
         const info = [item.ano, item.genero].filter(Boolean).join(" • ");
         const card = document.createElement("div");
@@ -3472,13 +3604,14 @@
 
     /* ------------------------------------------------- */
     /* PROMOÇÕES DE JOGOS                                */
-    /* Consome só o backend Neon: /api/deals, /api/deals/top,             */
-    /* /api/games/search e /api/games/:id/deals. A CheapShark fica        */
-    /* escondida atrás do backend — o frontend nunca fala com ela.        */
+    /* Consome só o backend Neon: /api/deals (lista e busca por título,   */
+    /* via filtro `title`), /api/stores e /api/games/:id/deals (modal de  */
+    /* comparação). A CheapShark fica escondida atrás do backend — o      */
+    /* frontend nunca fala com ela.                                      */
     /* ------------------------------------------------- */
     const promoState = {
       iniciado: false,
-      modo: "deals",        // "deals" (lista geral) ou "busca" (por nome)
+      modo: "deals",        // sempre "deals": busca por nome usa o mesmo endpoint (filtro title)
       pagina: 0,
       limit: 20,
       carregando: false,
@@ -3499,10 +3632,10 @@
       return n == null || isNaN(n) ? "—" : fmtBRL.format(Number(n));
     }
 
-    // Remove itens repetidos. Em "deals" a chave é jogo + loja (o mesmo jogo em
-    // lojas diferentes é mantido de propósito). Em "busca" não há loja, então a
-    // chave é só o título. Em empate, fica o de menor preço.
-    function dedupePromo(lista, modo) {
+    // Remove itens repetidos. A chave é jogo + loja: o mesmo jogo em lojas
+    // diferentes é mantido de propósito (é o objetivo: comparar). Em empate,
+    // fica o de menor preço.
+    function dedupePromo(lista) {
       const precoDe = (it) =>
         (it.pricing && it.pricing.sale != null ? it.pricing.sale : it.cheapestPrice);
       const vistos = new Map();
@@ -3510,7 +3643,7 @@
       (lista || []).forEach((it) => {
         const titulo = (it.title || "").trim().toLowerCase();
         const loja = it.store && it.store.id ? String(it.store.id) : "";
-        const chave = modo === "busca" ? titulo : titulo + "|" + loja;
+        const chave = titulo + "|" + loja;
         if (!vistos.has(chave)) {
           vistos.set(chave, out.length);
           out.push(it);
@@ -3610,29 +3743,25 @@
 
       const f = promoState.filtros;
       try {
-        if (f.busca) {
-          // Modo busca: nome digitado pelo usuário.
-          promoState.modo = "busca";
-          const corpo = await promoGet("/api/games/search", { q: f.busca, limit: 24 });
-          promoState.itens = dedupePromo(corpo.data || [], "busca");
-          promoState.fim = true;
-        } else {
-          // Modo lista: promoções gerais paginadas.
-          promoState.modo = "deals";
-          const corpo = await promoGet("/api/deals", {
-            page: promoState.pagina,
-            limit: promoState.limit,
-            sort: f.ordem,
-            onSale: 1,
-            store: f.loja || undefined,
-            upperPrice: f.preco || undefined
-          });
-          // Junta com o que já tinha e remove repetidos (mesmo jogo + mesma loja),
-          // inclusive os que cruzam páginas. Jogo em lojas diferentes fica.
-          promoState.itens = dedupePromo(promoState.itens.concat(corpo.data || []), "deals");
-          promoState.fim = !(corpo.pagination && corpo.pagination.hasMore);
-          promoState.pagina += 1;
-        }
+        // Sempre via /api/deals (mesmo com texto digitado, usado como filtro
+        // `title`), porque só esse endpoint devolve a loja de cada oferta.
+        // /api/games/search não informa em qual loja está o preço, então não
+        // dava para mostrar "em qual loja está a promoção" para jogo buscado.
+        promoState.modo = "deals";
+        const corpo = await promoGet("/api/deals", {
+          page: promoState.pagina,
+          limit: promoState.limit,
+          sort: f.ordem,
+          onSale: 1,
+          store: f.loja || undefined,
+          upperPrice: f.preco || undefined,
+          title: f.busca || undefined
+        });
+        // Junta com o que já tinha e remove repetidos (mesmo jogo + mesma loja),
+        // inclusive os que cruzam páginas. Jogo em lojas diferentes fica.
+        promoState.itens = dedupePromo(promoState.itens.concat(corpo.data || []));
+        promoState.fim = !(corpo.pagination && corpo.pagination.hasMore);
+        promoState.pagina += 1;
         renderPromocoes();
       } catch (e) {
         mensagemNoGrid(
@@ -4150,6 +4279,7 @@
 
       adicionarMensagem(mensagem, "usuario");
       inputMensagem.value = "";
+      inputMensagem.placeholder = "";
       inputMensagem.focus();
       botaoEnviar.disabled = true;
 
@@ -4162,7 +4292,9 @@
           body: JSON.stringify({
             message: mensagem,
             // Cada conversa da barra lateral tem seu próprio contexto no backend.
-            sessionId: conversaAtual?.id || "default"
+            sessionId: conversaAtual?.id || "default",
+            // Personalidade escolhida em Configurações (padrão: "geek").
+            personality: localStorage.getItem("atomix-personality") || "geek"
           })
         });
 

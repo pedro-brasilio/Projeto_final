@@ -206,36 +206,104 @@ async function mapaDeGeneros() {
   return mapa;
 }
 
-// Filmes mais bem avaliados, com pôster, no formato que o frontend já espera:
+// Monta o card no mesmo formato que o frontend já espera:
 // { id, titulo, ano, nota, genero, cover }
-export async function catalogoFilmes({ limite = 12 } = {}) {
-  const n = Math.min(Math.max(Number(limite) || 12, 1), 24);
+function paraCardFilme(f, generos) {
+  return {
+    id: `m-${f.id}`,
+    titulo: f.title || f.original_title || "Sem título",
+    ano: (f.release_date || "").slice(0, 4) || null,
+    nota: f.vote_average ? `★ ${f.vote_average.toFixed(1)}` : "★ –",
+    genero:
+      (f.genre_ids || [])
+        .map((id) => generos.get(id))
+        .filter(Boolean)
+        .slice(0, 2)
+        .join(" / ") || "Filme",
+    cover: IMG_BASE + f.poster_path
+  };
+}
+
+// A TMDB pode listar o mesmo filme mais de uma vez (reedições/relançamentos
+// com id diferente). O critério de duplicata é nome + ano (não o id, que
+// nunca colide entre essas reedições). Mantém só a 1ª ocorrência (a lista já
+// vem ordenada por nota/relevância).
+function dedupeCards(cards) {
+  const vistos = new Set();
+  return cards.filter((c) => {
+    const chave = `${(c.titulo || "").trim().toLowerCase()}|${c.ano || ""}`;
+    if (vistos.has(chave)) return false;
+    vistos.add(chave);
+    return true;
+  });
+}
+
+// Filmes mais bem avaliados historicamente (usados para completar o
+// catálogo depois dos destaques do mês).
+async function filmesMaisAclamados(generos) {
   // /movie/top_rated hoje vem poluído com filmes obscuros de nota perfeita e
   // pouquíssimos votos. /discover com um piso de votos traz os clássicos
   // realmente aclamados.
-  const [data, generos] = await Promise.all([
-    tmdbFetch("/discover/movie", {
-      sort_by: "vote_average.desc",
-      "vote_count.gte": 3000,
-      include_adult: false,
-      page: 1
-    }),
-    mapaDeGeneros().catch(() => new Map())
-  ]);
+  const data = await tmdbFetch("/discover/movie", {
+    sort_by: "vote_average.desc",
+    "vote_count.gte": 3000,
+    include_adult: false,
+    page: 1
+  });
   return (data.results || [])
     .filter((f) => f.poster_path)
-    .slice(0, n)
-    .map((f) => ({
-      id: `m-${f.id}`,
-      titulo: f.title || f.original_title || "Sem título",
-      ano: (f.release_date || "").slice(0, 4) || null,
-      nota: f.vote_average ? `★ ${f.vote_average.toFixed(1)}` : "★ –",
-      genero:
-        (f.genre_ids || [])
-          .map((id) => generos.get(id))
-          .filter(Boolean)
-          .slice(0, 2)
-          .join(" / ") || "Filme",
-      cover: IMG_BASE + f.poster_path
-    }));
+    .map((f) => paraCardFilme(f, generos));
+}
+
+// Filmes em destaque no mês corrente (já em cartaz ou ainda por estrear),
+// ordenados por popularidade. Aparecem primeiro no catálogo mesmo sem terem
+// estreado ainda.
+async function filmesDestaqueDoMes(limite, generos) {
+  const agora = new Date();
+  const pad = (x) => String(x).padStart(2, "0");
+  const anoMes = `${agora.getUTCFullYear()}-${pad(agora.getUTCMonth() + 1)}`;
+  const ultimoDia = new Date(Date.UTC(agora.getUTCFullYear(), agora.getUTCMonth() + 1, 0)).getUTCDate();
+  const data = await tmdbFetch("/discover/movie", {
+    "primary_release_date.gte": `${anoMes}-01`,
+    "primary_release_date.lte": `${anoMes}-${pad(ultimoDia)}`,
+    sort_by: "popularity.desc",
+    include_adult: false,
+    region: REGION,
+    page: 1
+  });
+  return (data.results || [])
+    .filter((f) => f.poster_path)
+    .slice(0, limite)
+    .map((f) => paraCardFilme(f, generos));
+}
+
+// Catálogo para o "Filmes em Destaque": primeiro os destaques do mês (mesmo
+// que ainda não tenham estreado), depois os mais aclamados historicamente
+// até completar o limite.
+export async function catalogoFilmes({ limite = 12 } = {}) {
+  const n = Math.min(Math.max(Number(limite) || 12, 1), 24);
+  const qtdDestaque = Math.min(6, n);
+  const generos = await mapaDeGeneros().catch(() => new Map());
+  const [destaqueMes, aclamados] = await Promise.all([
+    filmesDestaqueDoMes(qtdDestaque, generos),
+    filmesMaisAclamados(generos)
+  ]);
+  return dedupeCards([...destaqueMes, ...aclamados]).slice(0, n);
+}
+
+// Busca livre por nome, no mesmo formato de card do catálogo em destaque.
+// Usada pela pesquisa do frontend para alcançar títulos além dos fixados.
+export async function buscarFilmesCatalogo(query, { limite = 24 } = {}) {
+  const termo = String(query || "").trim();
+  if (!termo) return [];
+  const n = Math.min(Math.max(Number(limite) || 24, 1), 40);
+  const [data, generos] = await Promise.all([
+    tmdbFetch("/search/movie", { query: termo, include_adult: false, region: REGION, page: 1 }),
+    mapaDeGeneros().catch(() => new Map())
+  ]);
+  return dedupeCards(
+    (data.results || [])
+      .filter((f) => f.poster_path)
+      .map((f) => paraCardFilme(f, generos))
+  ).slice(0, n);
 }
